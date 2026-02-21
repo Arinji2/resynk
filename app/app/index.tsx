@@ -1,5 +1,5 @@
 import { MaterialIcons } from "@expo/vector-icons";
-import { Stack } from "expo-router";
+import { Link, Stack } from "expo-router";
 import { ScrollView, View } from "react-native";
 import { Broadcast } from "@/components/routes/dashboard/broadcast";
 import { Notice } from "@/components/routes/dashboard/notice";
@@ -45,8 +45,10 @@ export default function Index() {
               </View>
             </View>
             <Button className="h-fit w-full py-3">
-              <MaterialIcons name="add-circle" size={18} color="white" />
-              <Text>Create New Report</Text>
+              <Link href="/reports">
+                <MaterialIcons name="add-circle" size={18} color="white" />
+                <Text>Create New Report</Text>
+              </Link>
             </Button>
           </View>
         </View>
