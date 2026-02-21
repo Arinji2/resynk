@@ -1,7 +1,7 @@
 import * as Nearby from "expo-nearby-connections";
 import { Strategy } from "expo-nearby-connections";
 
-const ENABLE_MESH_LOGS = true;
+const ENABLE_MESH_LOGS = false;
 const TAG = "[MeshSync]";
 const CHUNK_SIZE = 16 * 1024;
 
