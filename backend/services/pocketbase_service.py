@@ -7,14 +7,17 @@ INCIDENTS_COLLECTION = "incidents"
 def is_success(status_code: int) -> bool:
     return 200 <= status_code < 300
 
-def create_report(data):
+def create_report(data, auth_token=None):
     url = f"{POCKETBASE_URL}/api/collections/{REPORTS_COLLECTION}/records"
-   
+    headers = {}
+    if auth_token:
+        headers["Authorization"] = auth_token
+
     response = requests.post(url, json={
         "description": data.description,
         "latitude": data.latitude,
         "longitude": data.longitude
-    })
+    }, headers=headers)
 
     print("PocketBase Status:", response.status_code)
     print("PocketBase Response:", response.text)
