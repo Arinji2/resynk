@@ -2,7 +2,7 @@ import * as Nearby from "expo-nearby-connections";
 import { Strategy } from "expo-nearby-connections";
 
 const ENABLE_MESH_LOGS = true;
-const TAG = "[MeshSync:v2]";
+const TAG = "[MeshSync:v3]";
 
 function log(...args: any[]) {
   if (!ENABLE_MESH_LOGS) return;
@@ -30,12 +30,15 @@ export function createMeshSync(config: MeshConfig) {
   let unsubscribers: any[] = [];
 
   const connecting = new Set<string>();
+  const syncing = new Set<string>();
+
+  const entityMap = new Map(entities.map((e) => [e.name, e]));
 
   function start() {
     if (started) return;
     started = true;
 
-    log("Starting MeshSync v2 for", deviceId);
+    log("Starting MeshSync v3 for", deviceId);
 
     Nearby.startAdvertise(`${serviceId}::${deviceId}`, Strategy.P2P_CLUSTER)
       .then(() => log("Advertise started"))
@@ -45,10 +48,10 @@ export function createMeshSync(config: MeshConfig) {
 
     unsubscribers.push(
       Nearby.onPeerFound((peer) => {
-        log("Peer found:", peer.peerId, peer.name);
+        log("Peer found:", peer.peerId);
 
-        if (connecting.has(peer.peerId)) {
-          log("Already connecting to", peer.peerId);
+        if (connecting.has(peer.peerId) || syncing.has(peer.peerId)) {
+          log("Already busy with peer");
           return;
         }
 
@@ -59,7 +62,6 @@ export function createMeshSync(config: MeshConfig) {
           return;
         }
 
-        log("I am winner. Initiating connection.");
         connecting.add(peer.peerId);
 
         if (discovering) {
@@ -68,35 +70,33 @@ export function createMeshSync(config: MeshConfig) {
         }
 
         Nearby.requestConnection(peer.peerId).catch((e) => {
-          log("Connection request failed", e);
+          log("Connection failed", e);
           connecting.delete(peer.peerId);
         });
       }),
 
       Nearby.onInvitationReceived(({ peerId }) => {
         log("Invitation received from", peerId);
-
         connecting.add(peerId);
-
-        Nearby.acceptConnection(peerId).catch((e) => {
-          log("Accept failed", e);
+        Nearby.acceptConnection(peerId).catch(() => {
           connecting.delete(peerId);
         });
       }),
 
       Nearby.onConnected(({ peerId }) => {
         log("Connected to", peerId);
-        sendAllData(peerId);
+        sendHandshake(peerId);
       }),
 
       Nearby.onDisconnected(({ peerId }) => {
         log("Disconnected from", peerId);
         connecting.delete(peerId);
+        syncing.delete(peerId);
         startDiscovery();
       }),
 
       Nearby.onTextReceived(({ peerId, text }) => {
-        handleIncoming(peerId, text);
+        handleMessage(peerId, text);
       }),
     );
   }
@@ -105,7 +105,7 @@ export function createMeshSync(config: MeshConfig) {
     if (!started) return;
     started = false;
 
-    log("Stopping MeshSync v2");
+    log("Stopping MeshSync v3");
 
     Nearby.stopAdvertise().catch(() => {});
     Nearby.stopDiscovery().catch(() => {});
@@ -117,10 +117,11 @@ export function createMeshSync(config: MeshConfig) {
 
     unsubscribers = [];
     connecting.clear();
+    syncing.clear();
   }
 
   function startDiscovery() {
-    if (discovering || !started) return;
+    if (!started || discovering) return;
 
     discovering = true;
 
@@ -132,44 +133,109 @@ export function createMeshSync(config: MeshConfig) {
       });
   }
 
-  async function sendAllData(peerId: string) {
-    log("Sending ALL data to", peerId);
+  function sendHandshake(peerId: string) {
+    const state: Record<string, string[]> = {};
 
     for (const entity of entities) {
-      const ids = entity.getIds();
+      state[entity.name] = entity.getIds();
+    }
 
-      for (const id of ids) {
-        try {
+    Nearby.sendText(
+      peerId,
+      JSON.stringify({
+        type: "HANDSHAKE",
+        deviceId,
+        entities: state,
+      }),
+    ).catch((e) => log("Handshake send failed", e));
+  }
+
+  async function handleMessage(peerId: string, raw: string) {
+    let msg: any;
+
+    try {
+      msg = JSON.parse(raw);
+    } catch {
+      return;
+    }
+
+    if (msg.type === "HANDSHAKE") {
+      log("Received HANDSHAKE from", peerId);
+
+      const requests: { entity: string; ids: string[] }[] = [];
+
+      for (const [entityName, theirIds] of Object.entries(msg.entities || {})) {
+        const entity = entityMap.get(entityName);
+        if (!entity) continue;
+
+        const myIds = entity.getIds();
+        const missing = (theirIds as string[]).filter(
+          (id) => !myIds.includes(id),
+        );
+
+        if (missing.length > 0) {
+          requests.push({ entity: entityName, ids: missing });
+        }
+      }
+
+      if (requests.length > 0) {
+        syncing.add(peerId);
+
+        Nearby.sendText(
+          peerId,
+          JSON.stringify({
+            type: "REQUEST",
+            requests,
+          }),
+        ).catch(() => {});
+      } else {
+        Nearby.sendText(
+          peerId,
+          JSON.stringify({ type: "NOTHING_TO_REQUEST" }),
+        ).catch(() => {});
+      }
+    }
+
+    if (msg.type === "REQUEST") {
+      log("Received REQUEST from", peerId);
+
+      for (const req of msg.requests) {
+        const entity = entityMap.get(req.entity);
+        if (!entity) continue;
+
+        for (const id of req.ids) {
           const data = await entity.getById(id);
 
           await Nearby.sendText(
             peerId,
             JSON.stringify({
-              type: "ENTITY",
-              entity: entity.name,
+              type: "ENTITY_META",
+              entity: req.entity,
               data,
             }),
-          );
-
-          log("Sent entity", entity.name, id);
-        } catch (e) {
-          log("Failed sending entity", id, e);
+          ).catch(() => {});
         }
       }
+
+      Nearby.sendText(
+        peerId,
+        JSON.stringify({ type: "FINISHED_SENDING" }),
+      ).catch(() => {});
     }
-  }
 
-  function handleIncoming(peerId: string, raw: string) {
-    try {
-      const msg = JSON.parse(raw);
+    if (msg.type === "ENTITY_META") {
+      const entity = entityMap.get(msg.entity);
+      entity?.insertMeta(msg.data);
+    }
 
-      if (msg.type === "ENTITY") {
-        log("Received entity", msg.entity);
-        const entity = entities.find((e) => e.name === msg.entity);
-        entity?.insertMeta(msg.data);
-      }
-    } catch {
-      log("Invalid message from", peerId);
+    if (msg.type === "NOTHING_TO_REQUEST") {
+      log("Nothing to sync from", peerId);
+      syncing.delete(peerId);
+    }
+
+    if (msg.type === "FINISHED_SENDING") {
+      log("Peer finished sending", peerId);
+      syncing.delete(peerId);
     }
   }
 
