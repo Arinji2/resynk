@@ -11,13 +11,15 @@ import {
 } from "@expo-google-fonts/inter";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
 import { View } from "react-native";
 import { BottomBar } from "@/components/shared/bottom-bar";
 import { GridBackground } from "@/components/shared/grid";
 import { THEME } from "@/lib/theme";
+import { useUserProfile } from "@/lib/useUserProfile";
 import { queryClient } from "@/query-client";
 
 export {
@@ -51,8 +53,15 @@ export default function RootLayout() {
   if (fontsLoaded) {
     SplashScreen.hide();
   }
+  const { user, loaded } = useUserProfile();
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (loaded && (!user || !user.role)) {
+      router.replace("/onboarding");
+    }
+  }, [loaded, user]);
+
+  if (!fontsLoaded || !loaded) {
     return null;
   }
 

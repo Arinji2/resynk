@@ -26,12 +26,6 @@ const items = [
   },
 
   {
-    title: "Family",
-    url: "/family",
-    icon: "family-restroom",
-  },
-
-  {
     title: "Settings",
     url: "/settings",
     icon: "settings",
@@ -46,6 +40,8 @@ const items = [
 export function BottomBar() {
   const insets = useSafeAreaInsets();
   const currentURL = usePathname();
+
+  if (currentURL === "/onboarding") return null;
 
   return (
     <View
