@@ -28,22 +28,22 @@ export function Navbar(){
 <DashboardIcon className="size-6"  />
 <span className="text-sm font-medium">Dashboard</span>
 </a>
-<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors" href="#">
+<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
 <EmergencyHomeIcon className="size-6 text-foreground" />
 <span className="text-sm font-medium">Incident Cases</span>
 </a>
-<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors" href="#">
+<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
 <VolunteerNavIcon className="size-6 text-foreground" />
 <span className="text-sm font-medium">Volunteers</span>
 </a>
-<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors" href="#">
+<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
 <ChatNavIcon className="size-6 text-foreground" />
 <span className="text-sm font-medium">Chat</span>
 </a>
 <div className="px-3 pt-4 pb-2">
 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">System</span>
 </div>
-<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition-colors" href="#">
+<a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
 <SettingsNavIcon className="size-6 text-foreground" />
 <span className="text-sm font-medium">Settings</span>
 </a>
