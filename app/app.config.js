@@ -1,27 +1,32 @@
 export default ({ config }) => {
   const profile = process.env.EAS_BUILD_PROFILE;
 
-  let packageName = "com.arinji.resq";
+  let packageName = "com.arinji.resynk";
 
   if (profile === "preview") {
-    packageName = "com.arinji.resq.preview";
+    packageName = "com.arinji.resynk.preview";
   }
 
   if (profile === "development") {
-    packageName = "com.arinji.resq.dev";
+    packageName = "com.arinji.resynk.dev";
   }
 
   return {
     ...config,
-    name: "ResQ",
-    slug: "ResQ",
+    name: "Resynk",
+    slug: "resynk",
     version: "1.0.0",
     orientation: "portrait",
     icon: "./assets/images/icon.png",
-    scheme: "resq",
+    scheme: "resynk",
     userInterfaceStyle: "automatic",
     newArchEnabled: true,
     assetBundlePatterns: ["**/*"],
+    extra: {
+      eas: {
+        projectId: "25d2cbc5-480f-43ae-a66b-d19917604b12",
+      },
+    },
     ios: {
       supportsTablet: true,
       bundleIdentifier: packageName,
