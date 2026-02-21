@@ -1,4 +1,5 @@
 import "@/global.css";
+
 import {
   Inter_300Light,
   Inter_400Regular,
@@ -11,11 +12,18 @@ import {
 } from "@expo-google-fonts/inter";
 import { PortalHost } from "@rn-primitives/portal";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { router, Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { View } from "react-native";
 import { BottomBar } from "@/components/shared/bottom-bar";
+import { GridBackground } from "@/components/shared/grid";
+import { RecoveryModeProvider } from "@/lib/RecoveryModeProvider";
 import { THEME } from "@/lib/theme";
+import { useOnlineSync } from "@/lib/useOnlineSync";
+import { useUserProfile } from "@/lib/useUserProfile";
 import { queryClient } from "@/query-client";
 
 export {
@@ -28,8 +36,8 @@ export {
 
 const SCREEN_OPTIONS = {
   light: {
-    headerTransparent: true,
-    headerShadowVisible: true,
+    headerTransparent: false,
+    headerShadowVisible: false,
     headerStyle: { backgroundColor: THEME.background },
   },
 };
@@ -49,31 +57,56 @@ export default function RootLayout() {
   if (fontsLoaded) {
     SplashScreen.hide();
   }
+  const { user, loaded } = useUserProfile();
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (loaded && (!user || !user.role)) {
+      router.replace("/onboarding");
+    }
+  }, [loaded, user]);
+
+  useOnlineSync();
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: false,
+    }),
+  });
+  if (!fontsLoaded || !loaded) {
     return null;
   }
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar
-        style="dark"
-        backgroundColor={THEME.background}
-        translucent={false}
-      />
-      <Stack
-        screenOptions={{
-          ...SCREEN_OPTIONS.light,
-          headerTitleStyle: {
-            fontFamily: "Inter_700Bold",
-          },
-          contentStyle: {
-            paddingHorizontal: 10,
-          },
-        }}
-      />
-      <BottomBar />
-      <PortalHost />
+      <View style={{ flex: 1, backgroundColor: THEME.background }}>
+        <GridBackground />
+        <RecoveryModeProvider>
+          <StatusBar
+            style="dark"
+            backgroundColor={THEME.background}
+            translucent={false}
+          />
+
+          <Stack
+            screenOptions={{
+              ...SCREEN_OPTIONS.light,
+              headerTitleStyle: {
+                fontFamily: "Inter_700Bold",
+              },
+              contentStyle: {
+                backgroundColor: "transparent",
+                paddingHorizontal: 10,
+              },
+            }}
+          />
+
+          <BottomBar />
+        </RecoveryModeProvider>
+        <PortalHost />
+      </View>
     </QueryClientProvider>
   );
 }

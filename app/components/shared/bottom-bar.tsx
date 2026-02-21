@@ -5,30 +5,45 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Glyphs } from "@/lib/icon";
 import { THEME } from "@/lib/theme";
+import { useRecoveryMode } from "@/lib/RecoveryModeProvider";
 import { Text } from "../ui/text";
 
 const items = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/",
     icon: "dashboard",
   },
-] as [
+
   {
-    title: string;
-    url: string;
-    icon: Glyphs;
-    redirect?: string;
+    title: "Reports",
+    url: "/reports",
+    icon: "description",
   },
-];
+  {
+    title: "Notices",
+    url: "/notices",
+    icon: "campaign",
+  },
+
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: "settings",
+  },
+] as {
+  title: string;
+  url: string;
+  icon: Glyphs;
+  redirect?: string;
+}[];
 
 export function BottomBar() {
   const insets = useSafeAreaInsets();
   const currentURL = usePathname();
+  const { recoveryMode } = useRecoveryMode();
 
-  if (currentURL === "/" || currentURL.startsWith("/psychologist")) {
-    return null;
-  }
+  if (currentURL === "/onboarding") return null;
 
   return (
     <View
@@ -42,11 +57,12 @@ export function BottomBar() {
             : currentURL.startsWith(item.url);
 
         const itemTheme = vars({
-          "--color": isActive ? THEME.accent : THEME.foreground,
+          "--color": isActive ? THEME.primary : THEME["muted-foreground"],
         });
 
         return (
           <Link
+            disabled={!recoveryMode}
             href={
               (item.redirect
                 ? item.redirect
@@ -60,7 +76,8 @@ export function BottomBar() {
             >
               <MaterialIcons
                 name={item.icon}
-                className="color-[--color] size-5"
+                size={18}
+                color={isActive ? THEME.primary : THEME["muted-foreground"]}
               />
               <Text variant="small" className="text-[--color] text-xs">
                 {item.title}
