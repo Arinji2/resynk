@@ -1,5 +1,7 @@
 "use client";
 
+import { EmergencyHomeIcon } from "../icons/emergency-home";
+
 export function IncidentCard({ incidentCount }: { incidentCount: number }) {
   return (
     <div className="flex items-center justify-between rounded border-slate-200 border-y border-r border-l-4 border-l-primary bg-white p-4 shadow-card dark:border-slate-700">
@@ -13,7 +15,7 @@ export function IncidentCard({ incidentCount }: { incidentCount: number }) {
         </p>
       </div>
       <div className="flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-primary">
-        <span className="material-symbols-outlined">emergency_home</span>
+        <EmergencyHomeIcon className="size-8 text-destructive" />
       </div>
     </div>
   );
