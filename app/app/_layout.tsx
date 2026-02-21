@@ -14,7 +14,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { View } from "react-native";
 import { BottomBar } from "@/components/shared/bottom-bar";
+import { GridBackground } from "@/components/shared/grid";
 import { THEME } from "@/lib/theme";
 import { queryClient } from "@/query-client";
 
@@ -29,7 +31,7 @@ export {
 const SCREEN_OPTIONS = {
   light: {
     headerTransparent: true,
-    headerShadowVisible: true,
+    headerShadowVisible: false,
     headerStyle: { backgroundColor: THEME.background },
   },
 };
@@ -56,24 +58,31 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <StatusBar
-        style="dark"
-        backgroundColor={THEME.background}
-        translucent={false}
-      />
-      <Stack
-        screenOptions={{
-          ...SCREEN_OPTIONS.light,
-          headerTitleStyle: {
-            fontFamily: "Inter_700Bold",
-          },
-          contentStyle: {
-            paddingHorizontal: 10,
-          },
-        }}
-      />
-      <BottomBar />
-      <PortalHost />
+      <View style={{ flex: 1, backgroundColor: THEME.background }}>
+        <GridBackground />
+
+        <StatusBar
+          style="dark"
+          backgroundColor={THEME.background}
+          translucent={false}
+        />
+
+        <Stack
+          screenOptions={{
+            ...SCREEN_OPTIONS.light,
+            headerTitleStyle: {
+              fontFamily: "Inter_700Bold",
+            },
+            contentStyle: {
+              backgroundColor: "transparent",
+              paddingHorizontal: 10,
+            },
+          }}
+        />
+
+        <BottomBar />
+        <PortalHost />
+      </View>
     </QueryClientProvider>
   );
 }
