@@ -1,15 +1,11 @@
 "use client"
 
-import { ExpandMoreIcon } from "@/components/icons/expand_more-incident"
-import { SearchIcon } from "@/components/icons/search-incident"
-import { SortIcon } from "@/components/icons/sort-incident"
-
-export function SearchBar() {
-    return(
-        <div className="p-6 pb-2 border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-surface-dark sticky top-1 z-10 shadow-sm">
+export function SearchBarRep() {
+    return (
+        <div className="p-6 pb-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark sticky top-16 z-10 shadow-sm">
 <div className="flex flex-col xl:flex-row gap-4 justify-between items-start xl:items-center">
 <div className="relative w-full xl:w-96">
-<SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+<span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 material-symbols-outlined text-[20px]">search</span>
 <input className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded text-sm focus:ring-2 focus:ring-primary-accent focus:border-transparent outline-none transition-all placeholder:text-slate-400 text-slate-700 dark:text-slate-200" placeholder="Search report ID, keywords..." type="text" />
 </div>
 <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">

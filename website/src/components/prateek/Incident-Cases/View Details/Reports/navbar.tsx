@@ -7,7 +7,7 @@ import { Diversity3Icon } from "@/components/icons/diversity_3"
 import { PersonalInjuryIcon } from "@/components/icons/personal_injury"
 import { SettingsNavIcon } from "@/components/icons/SettingsNav"
 
-export function NavBar({SectorName}: {SectorName: String}) {
+export function NavBarRep({SectorName}: {SectorName: String}) {
     
 return (
         <div className="w-64 h-svh flex flex-col border-r border-slate-200 bg-white shadow-lg">
@@ -15,11 +15,12 @@ return (
                 <h1 className="text font-bold tracking-tight text-slate-900 uppercase">Sector {SectorName}<br /> <span className="text-primary text-xs font-semibold">Incident Cmd</span></h1>
             </div>
             <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-                <a className="flex h-10 items-center gap-3 rounded px-3 bg-slate-100 text-foreground shadow-sm font-semibold border border-slate-200 " href="#">
+                <a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
                     <DashboardIcon className="size-7 text-slate" />
                     <span className="text font-medium text-slate">Dashboard</span>
                 </a>
-                <a className="group flex h-10 items-center gap-3 rounded px-3 text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors" href="#">
+                
+                    <a className="flex h-10 items-center gap-3 rounded px-3 bg-slate-100 text-foreground shadow-sm font-semibold border border-slate-200 " href="#">
                     <DescriptionIcon className="size-7 text-slate" />
                     <span className="text font-medium text-slate">Reports</span>
                 </a>
