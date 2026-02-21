@@ -1,5 +1,5 @@
 from fastapi import FastAPI 
-from routes import reports,incidents,sync, news
+from routes import reports,incidents,sync, news, pb_auth_service
 
 
 app = FastAPI(
@@ -12,6 +12,7 @@ app.include_router(reports.router, prefix="/reports", tags=["Reports"])
 #app.include_router(sync.router, prefix="/sync", tags=["Sync"])
 app.include_router(incidents.router, prefix="/incidents", tags=["Incidents"])
 app.include_router(news.router, prefix="/news", tags=["NEWS"])
+app.include_router(pb_auth_service.router, prefix="/auth", tags=["Auth"])
 
 @app.get("/health")
 def health():
