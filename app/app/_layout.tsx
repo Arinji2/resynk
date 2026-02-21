@@ -30,7 +30,7 @@ export {
 
 const SCREEN_OPTIONS = {
   light: {
-    headerTransparent: true,
+    headerTransparent: false,
     headerShadowVisible: false,
     headerStyle: { backgroundColor: THEME.background },
   },

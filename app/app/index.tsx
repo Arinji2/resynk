@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { View } from "react-native";
+import { Notice } from "@/components/routes/dashboard";
 import { Header } from "@/components/shared/header";
 
 export default function Index() {
@@ -11,10 +12,16 @@ export default function Index() {
       <View
         style={{
           flex: 1,
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "center",
         }}
-      ></View>
+      >
+        <Notice
+          status="warning"
+          title="Severe Weather Warning"
+          description="Flood warning in effect for your sector (Zone A). Please avoid low-lying areas and check local news."
+        />
+      </View>
     </>
   );
 }
