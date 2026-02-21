@@ -63,6 +63,8 @@ export default function Index() {
           </View>
           <View className="flex h-fit w-full flex-col items-center justify-center gap-2">
             <Report />
+            <Report />
+            <Report />
           </View>
         </View>
       </ScrollView>
