@@ -2,6 +2,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { View } from "react-native";
 import { Text } from "@/components/ui/text";
 import type { Glyphs } from "@/lib/icon";
+import { THEME } from "@/lib/theme";
 
 type NoticeMode = "electricity" | "warning" | "water" | "medical";
 
@@ -97,6 +98,26 @@ export function Notice({
           </Text>
         </View>
       </View>
+      {sentAt && syncedAt && (
+        <View className="mt-4 flex h-fit w-full flex-row items-center justify-between">
+          <View className="flex h-fit w-fit flex-row items-center justify-center gap-1">
+            <MaterialIcons
+              name="send"
+              size={16}
+              color={THEME["muted-foreground"]}
+            />
+            <Text className="text-muted-foreground text-xs">
+              Sent: {sentAt.toLocaleDateString("en-GB")}
+            </Text>
+          </View>
+          <View className="flex h-fit w-fit flex-row items-center justify-center gap-1">
+            <MaterialIcons name="refresh" size={16} color={"#0a986c"} />
+            <Text className="text-[#0a986c] text-xs">
+              Synced: {sentAt.toLocaleDateString("en-GB")}
+            </Text>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
