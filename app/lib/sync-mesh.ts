@@ -2,7 +2,7 @@ import * as Nearby from "expo-nearby-connections";
 import { Strategy } from "expo-nearby-connections";
 
 const ENABLE_MESH_LOGS = true;
-const TAG = "[MeshSync:v1]";
+const TAG = "[MeshSync:v2]";
 
 function log(...args: any[]) {
   if (!ENABLE_MESH_LOGS) return;
@@ -26,33 +26,62 @@ export function createMeshSync(config: MeshConfig) {
   const { deviceId, serviceId, entities } = config;
 
   let started = false;
+  let discovering = false;
   let unsubscribers: any[] = [];
+
+  const connecting = new Set<string>();
 
   function start() {
     if (started) return;
     started = true;
 
-    log("Starting MeshSync v1 for", deviceId);
+    log("Starting MeshSync v2 for", deviceId);
 
     Nearby.startAdvertise(`${serviceId}::${deviceId}`, Strategy.P2P_CLUSTER)
       .then(() => log("Advertise started"))
       .catch((e) => log("Advertise error", e));
 
-    Nearby.startDiscovery(`${serviceId}::`, Strategy.P2P_CLUSTER)
-      .then(() => log("Discovery started"))
-      .catch((e) => log("Discovery error", e));
+    startDiscovery();
 
     unsubscribers.push(
       Nearby.onPeerFound((peer) => {
-        log("Peer found:", peer.peerId);
-        Nearby.requestConnection(peer.peerId).catch((e) =>
-          log("Connection request failed", e),
-        );
+        log("Peer found:", peer.peerId, peer.name);
+
+        if (connecting.has(peer.peerId)) {
+          log("Already connecting to", peer.peerId);
+          return;
+        }
+
+        const theirDeviceId = peer.name?.split("::")?.[1] ?? peer.peerId;
+
+        if (deviceId > theirDeviceId) {
+          log("Waiting for other device to initiate");
+          return;
+        }
+
+        log("I am winner. Initiating connection.");
+        connecting.add(peer.peerId);
+
+        if (discovering) {
+          Nearby.stopDiscovery().catch(() => {});
+          discovering = false;
+        }
+
+        Nearby.requestConnection(peer.peerId).catch((e) => {
+          log("Connection request failed", e);
+          connecting.delete(peer.peerId);
+        });
       }),
 
       Nearby.onInvitationReceived(({ peerId }) => {
         log("Invitation received from", peerId);
-        Nearby.acceptConnection(peerId).catch((e) => log("Accept failed", e));
+
+        connecting.add(peerId);
+
+        Nearby.acceptConnection(peerId).catch((e) => {
+          log("Accept failed", e);
+          connecting.delete(peerId);
+        });
       }),
 
       Nearby.onConnected(({ peerId }) => {
@@ -60,12 +89,14 @@ export function createMeshSync(config: MeshConfig) {
         sendAllData(peerId);
       }),
 
-      Nearby.onTextReceived(({ peerId, text }) => {
-        handleIncoming(peerId, text);
-      }),
-
       Nearby.onDisconnected(({ peerId }) => {
         log("Disconnected from", peerId);
+        connecting.delete(peerId);
+        startDiscovery();
+      }),
+
+      Nearby.onTextReceived(({ peerId, text }) => {
+        handleIncoming(peerId, text);
       }),
     );
   }
@@ -74,7 +105,7 @@ export function createMeshSync(config: MeshConfig) {
     if (!started) return;
     started = false;
 
-    log("Stopping MeshSync v1");
+    log("Stopping MeshSync v2");
 
     Nearby.stopAdvertise().catch(() => {});
     Nearby.stopDiscovery().catch(() => {});
@@ -85,6 +116,20 @@ export function createMeshSync(config: MeshConfig) {
     });
 
     unsubscribers = [];
+    connecting.clear();
+  }
+
+  function startDiscovery() {
+    if (discovering || !started) return;
+
+    discovering = true;
+
+    Nearby.startDiscovery(`${serviceId}::`, Strategy.P2P_CLUSTER)
+      .then(() => log("Discovery started"))
+      .catch((e) => {
+        log("Discovery error", e);
+        discovering = false;
+      });
   }
 
   async function sendAllData(peerId: string) {
@@ -123,7 +168,7 @@ export function createMeshSync(config: MeshConfig) {
         const entity = entities.find((e) => e.name === msg.entity);
         entity?.insertMeta(msg.data);
       }
-    } catch (e) {
+    } catch {
       log("Invalid message from", peerId);
     }
   }
