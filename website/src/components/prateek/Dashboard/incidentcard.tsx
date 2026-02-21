@@ -1,10 +1,10 @@
-"use client";
+"use client"
 
-import { EmergencyHomeIcon } from "../icons/emergency-home";
+import { EmergencyHomeIcon } from "../../icons/emergency-home";
 
 export function IncidentCard({ incidentCount }: { incidentCount: number }) {
   return (
-    <div className="flex items-center justify-between rounded border-slate-200 border-y border-r border-l-4 border-l-primary bg-white p-4 shadow-card dark:border-slate-700">
+    <div className="flex items-center justify-between rounded border-slate-200 border-y border-r border-l-4 border-l-foreground bg-white p-4 shadow-card">
       <div>
         <p className="mb-1 font-bold text-slate-500 text-xs uppercase tracking-wider">
           Total Incidents
@@ -15,7 +15,7 @@ export function IncidentCard({ incidentCount }: { incidentCount: number }) {
         </p>
       </div>
       <div className="flex h-12 w-12 items-center justify-center rounded bg-slate-100 text-primary">
-        <EmergencyHomeIcon className="size-8 text-destructive" />
+        <EmergencyHomeIcon className="size-8 text-foreground" />
       </div>
     </div>
   );
