@@ -1,15 +1,28 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from typing import List
-from services.pocketbase_service import create_bulk_reports
+from services.sync_service import sync_family
 
-router=APIRouter()
+router = APIRouter()
 
-class ReportIn(BaseModel):
-    description:str
-    latitude: float
-    longitude: float
+
+class FamilyMemberIn(BaseModel):
+    name: str
+    blood_type: str = ""
+    is_head: bool = False
+    allergies: str = ""
+    medication: str = ""
+    other_info: str = ""
+    age: int = 0
+
+
+class SyncRequest(BaseModel):
+    family: list[FamilyMemberIn]
+
 
 @router.post("/")
-def bulk_sync(data: list[ReportIn]):
-    return create_bulk_reports(data)
+def family_sync(data: SyncRequest):
+    if not data.family:
+        raise HTTPException(status_code=400, detail="Family array cannot be empty")
+
+    family_dicts = [m.model_dump() for m in data.family]
+    return sync_family(family_dicts)
