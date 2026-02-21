@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Base */
+    --background: 240 10% 97%; /* #f6f6f8 */
+    --foreground: 222 47% 11%; /* #0f172a */
+
+    --card: 0 0% 100%; /* #ffffff */
+    --card-foreground: 222 47% 11%; /* #0f172a */
+
+    --popover: 0 0% 100%; /* #ffffff */
+    --popover-foreground: 222 47% 11%; /* #0f172a */
+
+    /* Brand */
+    --primary: 220 85% 50%; /* #135bec */
+    --primary-foreground: 0 0% 100%; /* #ffffff */
+
+    --secondary: 210 40% 96%; /* #f1f5f9 */
+    --secondary-foreground: 222 47% 11%; /* #0f172a */
+
+    --muted: 210 40% 96%; /* #f1f5f9 */
+    --muted-foreground: 215 16% 47%; /* #64748b */
+
+    --accent: 210 40% 96%; /* #f1f5f9 */
+    --accent-foreground: 222 47% 11%; /* #0f172a */
+
+    /* Destructive */
+    --destructive: 0 84% 60%; /* #ef4444 */
+    --destructive-foreground: 0 85% 97%; /* #fef2f2 */
+    --destructive-muted: 0 92% 95%; /* #fee2e2 */
+    --destructive-muted-foreground: 0 63% 31%; /* #7f1d1d */
+
+    /* Success */
+    --success: 158 64% 52%; /* #34d399 */
+    --success-foreground: 0 0% 9%; /* #171717 */
+    --success-muted: 158 60% 95%; /* soft mint bg */
+    --success-muted-foreground: 158 55% 30%; /* darker mint */
+
+    /* Structural */
+    --border: 214 32% 91%; /* #e2e8f0 */
+    --input: 214 32% 91%; /* #e2e8f0 */
+    --ring: 220 85% 50%; /* #135bec */
+    --radius: 1rem;
+
+    /* Charts */
+    --chart-1: 220 85% 50%; /* #135bec */
+    --chart-2: 158 64% 52%; /* #34d399 */
+    --chart-3: 25 95% 53%; /* #f97316 */
+    --chart-4: 45 93% 47%; /* #eab308 */
+
+    /* Misc */
+    --moderate: 45 93% 47%; /* #eab308 */
+  }
+}
