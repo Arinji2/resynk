@@ -12,6 +12,7 @@ export type ReportType = {
   deviceId: string;
   latitude?: number;
   longitude?: number;
+  meshSyncId: string;
 };
 export function Report({ report }: { report: ReportType }) {
   return (

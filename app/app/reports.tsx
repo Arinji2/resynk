@@ -1,3 +1,6 @@
+import "react-native-get-random-values";
+import { v4 as uuid } from "uuid";
+
 import { MaterialIcons } from "@expo/vector-icons";
 import { deviceName } from "expo-device";
 import { File, Paths } from "expo-file-system";
@@ -10,6 +13,7 @@ import * as SQLite from "expo-sqlite";
 import * as TaskManager from "expo-task-manager";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Alert, Image, ScrollView, View } from "react-native";
+
 import { Header } from "@/components/shared/header";
 import { Report, type ReportType } from "@/components/shared/report";
 import {
@@ -67,6 +71,7 @@ export default function Reports() {
     db.execSync(`
       CREATE TABLE IF NOT EXISTS reports (
         id TEXT PRIMARY KEY NOT NULL,
+        meshSyncId TEXT UNIQUE NOT NULL,
         title TEXT,
         description TEXT,
         imageUri TEXT,
@@ -82,9 +87,12 @@ export default function Reports() {
 
   const insertReport = (r: ReportType) => {
     db.runSync(
-      `INSERT OR IGNORE INTO reports VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT OR IGNORE INTO reports
+       (id, meshSyncId, title, description, imageUri, createdAt, deviceId, latitude, longitude)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         r.id,
+        r.meshSyncId,
         r.title,
         r.description,
         r.imageUri,
@@ -94,7 +102,7 @@ export default function Reports() {
         r.longitude ?? null,
       ],
     );
-    // Reload from DB to ensure refs and state are perfectly aligned (like in testing code)
+
     loadReports();
   };
 
@@ -105,7 +113,6 @@ export default function Reports() {
 
   const deleteAllReports = async () => {
     try {
-      // Delete image files first (optional but recommended)
       for (const r of reportsRef.current) {
         if (r.imageUri) {
           try {
@@ -116,22 +123,16 @@ export default function Reports() {
         }
       }
 
-      // Clear database
       db.execSync(`DELETE FROM reports;`);
-
-      // Refresh UI state completely
       loadReports();
 
-      // Restart the mesh so it re-handshakes with peers using the now-empty
-      // ID list — they'll see we're missing everything and re-send it all
       if (meshRef.current) {
         meshRef.current.stop();
         meshRef.current.start();
       }
 
       Alert.alert("All data deleted");
-    } catch (err) {
-      console.error("Delete failed", err);
+    } catch {
       Alert.alert("Failed to delete data");
     }
   };
@@ -196,6 +197,7 @@ export default function Reports() {
       return Alert.alert("Fill all fields");
 
     const id = `${deviceId}-${Date.now()}`;
+    const meshSyncId = uuid();
 
     let coords = { latitude: 0, longitude: 0 };
 
@@ -204,8 +206,10 @@ export default function Reports() {
       coords = loc?.coords ?? { latitude: 0, longitude: 0 };
     } catch {}
 
+    // Creating the report mapping appropriately to fix Type Error regarding 'meshSyncId'
     insertReport({
       id,
+      meshSyncId,
       title,
       description,
       imageUri,
@@ -227,21 +231,25 @@ export default function Reports() {
 
     const reportsAdapter = {
       name: "reports",
-      getIds: () => reportsRef.current.map((r) => r.id),
-      getById: async (id: string) =>
-        reportsRef.current.find((r) => r.id === id),
+      getIds: () => reportsRef.current.map((r) => r.meshSyncId),
+      getById: async (meshSyncId: string) =>
+        reportsRef.current.find((r) => r.meshSyncId === meshSyncId),
       insertMeta: (data: ReportType) => {
-        // Must wipe incoming remote URI path so we don't try loading it before binary arrives
         insertReport({ ...data, imageUri: "" });
       },
-      updateBinary: async (id: string, base64: string) => {
-        const file = new File(Paths.document, id + ".jpg");
+      updateBinary: async (meshSyncId: string, base64: string) => {
+        const report = reportsRef.current.find(
+          (r) => r.meshSyncId === meshSyncId,
+        );
+        if (!report) return;
+
+        const file = new File(Paths.document, report.id + ".jpg");
 
         await FileSystemLegacy.writeAsStringAsync(file.uri, base64, {
           encoding: FileSystemLegacy.EncodingType.Base64,
         });
 
-        updateReportImage(id, file.uri);
+        updateReportImage(report.id, file.uri);
       },
     };
 
@@ -257,11 +265,8 @@ export default function Reports() {
     return () => mesh.stop();
   }, [ready, deviceId]);
 
-  // ---------------- UI ----------------
-
   if (!ready)
     return <Text style={{ padding: 32 }}>Waiting for permissions...</Text>;
-
   return (
     <>
       <Stack.Screen options={{ header: () => <Header title="My Reports" /> }} />

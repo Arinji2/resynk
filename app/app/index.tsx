@@ -50,18 +50,6 @@ export default function Index() {
             </Button>
           </View>
         </View>
-
-        <View className="flex h-fit w-full flex-col items-center justify-center gap-4">
-          <View className="flex h-fit w-full flex-row items-center justify-between">
-            <Text variant={"muted"} className="font-medium">
-              PREVIOUS REPORTS
-            </Text>
-            <Text variant={"small"} className="font-medium text-primary">
-              View All
-            </Text>
-          </View>
-          <View className="flex h-fit w-full flex-col items-center justify-center gap-2"></View>
-        </View>
       </ScrollView>
     </>
   );

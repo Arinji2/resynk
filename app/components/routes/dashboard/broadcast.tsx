@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
-import { useRecoveryMode } from "@/lib/useRecoveryMode";
+import { useRecoveryMode } from "@/lib/RecoveryModeProvider";
 import { cn } from "@/lib/utils";
 
 export function Broadcast() {

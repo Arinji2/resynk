@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { Glyphs } from "@/lib/icon";
 import { THEME } from "@/lib/theme";
+import { useRecoveryMode } from "@/lib/RecoveryModeProvider";
 import { Text } from "../ui/text";
 
 const items = [
@@ -40,6 +41,7 @@ const items = [
 export function BottomBar() {
   const insets = useSafeAreaInsets();
   const currentURL = usePathname();
+  const { recoveryMode } = useRecoveryMode();
 
   if (currentURL === "/onboarding") return null;
 
@@ -60,6 +62,7 @@ export function BottomBar() {
 
         return (
           <Link
+            disabled={!recoveryMode}
             href={
               (item.redirect
                 ? item.redirect
