@@ -27,7 +27,7 @@ export default function Index() {
           description="Flood warning in effect for your sector (Zone A). Please avoid low-lying areas and check local news."
         />
         <View className="flex h-fit w-fit flex-col items-center justify-center gap-10 rounded-lg border-[0.5px] border-border bg-background p-4">
-          <Broadcast defaultChecked />
+          <Broadcast />
 
           <View className="flex h-fit w-[70%] flex-col items-center justify-center gap-6">
             <View className="flex h-fit w-full flex-row items-center justify-between">

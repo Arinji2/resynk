@@ -1,11 +1,14 @@
-import { useState } from "react";
 import { View } from "react-native";
 import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
+import { useRecoveryMode } from "@/lib/useRecoveryMode";
 import { cn } from "@/lib/utils";
 
-export function Broadcast({ defaultChecked }: { defaultChecked?: boolean }) {
-  const [checked, setChecked] = useState(defaultChecked ?? false);
+export function Broadcast() {
+  const { recoveryMode, setRecoveryMode, loaded } = useRecoveryMode();
+
+  if (!loaded) return null;
+
   return (
     <View className="flex h-fit w-full flex-col items-center justify-center gap-3">
       <Text variant="small" className="text-muted-foreground">
@@ -14,15 +17,16 @@ export function Broadcast({ defaultChecked }: { defaultChecked?: boolean }) {
 
       <Switch
         className="scale-125"
-        checked={checked}
-        onCheckedChange={(value) => setChecked(value)}
+        checked={recoveryMode}
+        onCheckedChange={setRecoveryMode}
       />
+
       <Text
         className={cn("font-bold text-primary", {
-          "text-foreground": !checked,
+          "text-foreground": !recoveryMode,
         })}
       >
-        RECOVERY MODE: {checked ? "ACTIVE" : "INACTIVE"}
+        RECOVERY MODE: {recoveryMode ? "ACTIVE" : "INACTIVE"}
       </Text>
     </View>
   );
