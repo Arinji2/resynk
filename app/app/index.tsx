@@ -4,7 +4,6 @@ import { ScrollView, View } from "react-native";
 import { Broadcast } from "@/components/routes/dashboard/broadcast";
 import { Notice } from "@/components/routes/dashboard/notice";
 import { Header } from "@/components/shared/header";
-import { Report } from "@/components/shared/report";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
@@ -61,11 +60,7 @@ export default function Index() {
               View All
             </Text>
           </View>
-          <View className="flex h-fit w-full flex-col items-center justify-center gap-2">
-            <Report />
-            <Report />
-            <Report />
-          </View>
+          <View className="flex h-fit w-full flex-col items-center justify-center gap-2"></View>
         </View>
       </ScrollView>
     </>
