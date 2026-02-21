@@ -1,28 +1,45 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from services.sync_service import sync_family
+
+from services.sync_service import sync_data
 
 router = APIRouter()
 
 
-class FamilyMemberIn(BaseModel):
-    name: str
-    blood_type: str = ""
-    is_head: bool = False
-    allergies: str = ""
-    medication: str = ""
-    other_info: str = ""
+class UserIn(BaseModel):
+    name: str = ""
+    role: str = ""
     age: int = 0
+    aadharNumber: str = ""
+    allergies: str = ""
+    medications: str = ""
+    bloodGroup: str = ""
+
+
+class LocationIn(BaseModel):
+    lat: float = 0.0
+    lon: float = 0.0
+
+
+class ReportIn(BaseModel):
+    id: str = ""
+    title: str = ""
+    description: str = ""
+    imageUri: str = ""
+    createdAt: str = ""
+    latitude: float = 0.0
+    longitude: float = 0.0
+    meshSyncID: str = ""
 
 
 class SyncRequest(BaseModel):
-    family: list[FamilyMemberIn]
+    user: UserIn
+    reports: list[ReportIn] = []
 
 
 @router.post("/")
-def family_sync(data: SyncRequest):
-    if not data.family:
-        raise HTTPException(status_code=400, detail="Family array cannot be empty")
+def sync(data: SyncRequest):
+    if not data.user.aadharNumber:
+        raise HTTPException(status_code=400, detail="User aadharNumber is required")
 
-    family_dicts = [m.model_dump() for m in data.family]
-    return sync_family(family_dicts)
+    return sync_data(data.user, data.reports)
