@@ -48,12 +48,12 @@ export function Navbar(){
 <span className="text-sm font-medium">Settings</span>
 </a>
 </nav>
-<div className="border-t border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900">
+<div className="border-t border-slate-200 bg-slate-50 p-4">
 <div className="flex items-center gap-3">
 <div className="h-9 w-9 rounded bg-slate-300 flex items-center justify-center text-slate-600 font-bold">JD</div>
 <div className="flex flex-col">
-<span className="text-xs font-bold text-slate-900 dark:text-white uppercase">Officer Doe</span>
-<span className="text-[10px] text-slate-500 dark:text-slate-400">Chief Coordinator</span>
+<span className="text-xs font-bold text-slate-900 uppercase">Officer Doe</span>
+<span className="text-[10px] text-slate-500">Chief Coordinator</span>
 </div>
 </div>
 </div>

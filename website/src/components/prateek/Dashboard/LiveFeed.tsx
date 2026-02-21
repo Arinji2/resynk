@@ -2,7 +2,7 @@
 
 export function LiveFeed(){
     return (
-        <div className="h-8 bg-black dark:bg-black text-white flex items-center overflow-hidden border-t border-slate-700 shrink-0 z-30">
+        <div className="h-8 bg-black text-white flex items-center overflow-hidden border-t border-slate-700 shrink-0 z-30">
 <div className="bg-red-600 px-3 h-full flex items-center text-[10px] font-bold uppercase tracking-wider z-10 shadow-lg">
                     Live Feed
                 </div>

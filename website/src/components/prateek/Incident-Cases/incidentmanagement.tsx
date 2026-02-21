@@ -36,14 +36,14 @@ export function IncidentManagement({ incidents }: IncidentManagementProps) {
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex flex-col">
                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">#{incident.incidentNumber}</span>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white leading-tight">{incident.title}</h3>
+                    <h3 className="text-base font-bold text-slate-900 leading-tight">{incident.title}</h3>
                   </div>
                   <span className={`inline-flex items-center px-2 py-1 rounded text-[10px] font-bold uppercase ${incident.statusColor} border`}>{incident.status}</span>
                 </div>
-                <p className="text-xs text-slate-600 dark:text-slate-400 mb-4 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-600 mb-4 line-clamp-2 leading-relaxed">
                   {incident.description}
                 </p>
-                <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-xs border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div className="grid grid-cols-2 gap-y-3 gap-x-2 text-xs border-t border-slate-100 pt-4">
                   <div>
                     <span className="block text-[10px] font-bold text-slate-400 uppercase">Priority</span>
                     <span className={`font-bold ${incident.priorityColor} text-sm flex items-center gap-1`}>
@@ -51,15 +51,15 @@ export function IncidentManagement({ incidents }: IncidentManagementProps) {
                   </div>
                   <div>
                     <span className="block text-[10px] font-bold text-slate-400 uppercase">Total Reports</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200 text-sm">{incident.totalReports}</span>
+                    <span className="font-bold text-slate-800 text-sm">{incident.totalReports}</span>
                   </div>
                   <div>
                     <span className="block text-[10px] font-bold text-slate-400 uppercase">Area</span>
-                    <span className="font-medium text-slate-700 dark:text-slate-300">{incident.area}</span>
+                    <span className="font-medium text-slate-700">{incident.area}</span>
                   </div>
                   <div>
                     <span className="block text-[10px] font-bold text-slate-400 uppercase">Latest Update</span>
-                    <span className="font-medium text-slate-700 dark:text-slate-300">{incident.latestUpdate}</span>
+                    <span className="font-medium text-slate-700">{incident.latestUpdate}</span>
                   </div>
                 </div>
               </div>
@@ -70,7 +70,7 @@ export function IncidentManagement({ incidents }: IncidentManagementProps) {
                 {incident.assignees ? (
                   <div className="flex -space-x-2">
                     {incident.assignees.map((assignee, idx) => (
-                      <div key={idx} className={`h-6 w-6 rounded-full border-2 border-white dark:border-slate-800 ${assignee.bgColor} flex items-center justify-center text-[8px] font-bold ${assignee.textColor || ""}`}>
+                      <div key={idx} className={`h-6 w-6 rounded-full border-2 border-white ${assignee.bgColor} flex items-center justify-center text-[8px] font-bold ${assignee.textColor || ""}`}>
                         {assignee.initials}
                       </div>
                     ))}
