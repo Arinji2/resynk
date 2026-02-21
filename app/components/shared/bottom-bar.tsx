@@ -10,25 +10,42 @@ import { Text } from "../ui/text";
 const items = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/",
     icon: "dashboard",
   },
-] as [
+
   {
-    title: string;
-    url: string;
-    icon: Glyphs;
-    redirect?: string;
+    title: "Reports",
+    url: "/reports",
+    icon: "description",
   },
-];
+  {
+    title: "Notices",
+    url: "/notices",
+    icon: "campaign",
+  },
+
+  {
+    title: "Family",
+    url: "/family",
+    icon: "family-restroom",
+  },
+
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: "settings",
+  },
+] as {
+  title: string;
+  url: string;
+  icon: Glyphs;
+  redirect?: string;
+}[];
 
 export function BottomBar() {
   const insets = useSafeAreaInsets();
   const currentURL = usePathname();
-
-  if (currentURL === "/" || currentURL.startsWith("/psychologist")) {
-    return null;
-  }
 
   return (
     <View
@@ -42,7 +59,7 @@ export function BottomBar() {
             : currentURL.startsWith(item.url);
 
         const itemTheme = vars({
-          "--color": isActive ? THEME.accent : THEME.foreground,
+          "--color": isActive ? THEME.primary : THEME["muted-foreground"],
         });
 
         return (
@@ -60,7 +77,8 @@ export function BottomBar() {
             >
               <MaterialIcons
                 name={item.icon}
-                className="color-[--color] size-5"
+                size={18}
+                color={isActive ? THEME.primary : THEME["muted-foreground"]}
               />
               <Text variant="small" className="text-[--color] text-xs">
                 {item.title}

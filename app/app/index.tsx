@@ -1,26 +1,25 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { Stack } from "expo-router";
-import { useState } from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { Broadcast } from "@/components/routes/dashboard/broadcast";
 import { Notice } from "@/components/routes/dashboard/notice";
 import { Header } from "@/components/shared/header";
+import { Report } from "@/components/shared/report";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 
 export default function Index() {
-  const [checked, setChecked] = useState(false);
   return (
     <>
       <Stack.Screen
         options={{ header: () => <Header title="Recovery Dashboard" /> }}
       />
-      <View
-        style={{
-          flex: 1,
+      <ScrollView
+        contentContainerStyle={{
           justifyContent: "flex-start",
           alignItems: "center",
           gap: 40,
+          paddingBottom: 40,
         }}
       >
         <Notice
@@ -29,7 +28,7 @@ export default function Index() {
           description="Flood warning in effect for your sector (Zone A). Please avoid low-lying areas and check local news."
         />
         <View className="flex h-fit w-fit flex-col items-center justify-center gap-10 rounded-lg border-[0.5px] border-border bg-background p-4">
-          <Broadcast />
+          <Broadcast defaultChecked />
 
           <View className="flex h-fit w-[70%] flex-col items-center justify-center gap-6">
             <View className="flex h-fit w-full flex-row items-center justify-between">
@@ -52,7 +51,21 @@ export default function Index() {
             </Button>
           </View>
         </View>
-      </View>
+
+        <View className="flex h-fit w-full flex-col items-center justify-center gap-4">
+          <View className="flex h-fit w-full flex-row items-center justify-between">
+            <Text variant={"muted"} className="font-medium">
+              PREVIOUS REPORTS
+            </Text>
+            <Text variant={"small"} className="font-medium text-primary">
+              View All
+            </Text>
+          </View>
+          <View className="flex h-fit w-full flex-col items-center justify-center gap-2">
+            <Report />
+          </View>
+        </View>
+      </ScrollView>
     </>
   );
 }
