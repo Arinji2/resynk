@@ -1,5 +1,3 @@
-"use client";
-
 import { DownloadIcon } from "@/components/icons/download";
 import { NotificationAlertIcon } from "@/components/icons/notifalert";
 
@@ -11,7 +9,7 @@ export function Header({
   INC: string;
 }) {
   return (
-    <header className="sticky top-0 z-20 flex w-full shrink-0 items-center justify-between border-slate-200 border-b bg-white px-6 py-3 shadow-sm">
+    <header className=" top-0 z-20 flex w-full shrink-0 items-center justify-between border-slate-200 border-b bg-white px-6 py-3 shadow-sm">
       <div className="flex items-center gap-4">
         <button type="button" className="p-2 text-slate-500 md:hidden">
           <span className="material-symbols-outlined">menu</span>
