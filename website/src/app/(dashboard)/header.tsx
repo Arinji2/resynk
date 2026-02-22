@@ -19,6 +19,10 @@ export function Header({
     case "/incident-cases":
       name = "Incident Management";
       break;
+
+    case "/volunteers":
+      name = "Volunteer Management";
+      break;
   }
 
   return (

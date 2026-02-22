@@ -117,9 +117,9 @@ export enum IncidentsStatusOptions {
 	"irrelevant" = "irrelevant",
 }
 export type IncidentsRecord<Tai_infrastructure = unknown> = {
-	ai_how?: string
 	ai_infrastructure?: null | Tai_infrastructure
 	ai_what?: string
+	ai_when?: string
 	ai_where?: string
 	created: IsoAutoDateString
 	id: string

@@ -5,7 +5,7 @@ import pb from "../../../../pocketbase";
 export default async function Home() {
   const incidents = await pb.collection("incidents").getFullList();
   return (
-    <div className="h-svh w-full bg-background">
+    <div className="flex h-svh w-full flex-col items-center justify-start gap-4">
       <SearchBar />
       <IncidentManagement incidents={incidents} />
     </div>

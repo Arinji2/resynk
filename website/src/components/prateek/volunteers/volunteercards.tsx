@@ -1,50 +1,137 @@
-"use client"
-
+import { findClosestIncident } from "@/app/(dashboard)/volunteers/nearest";
 import { EmergencyVolIcon } from "@/components/icons/emergency-vol";
 import { LoactionIcon } from "@/components/icons/location-vol";
+import { cn } from "@/lib/utils";
+import type {
+  IncidentsRecord,
+  UsersRecord,
+} from "../../../../pocketbase-types";
 
-const defaultAvatarUrl = "/images/default-avatar.png"
+export function VolunteerCards({
+  volunteers,
+  incidents,
+}: {
+  volunteers: UsersRecord[];
+  incidents: IncidentsRecord[];
+}) {
+  const incidentCoords = incidents.map((i) => ({
+    id: i.id,
+    lat: i.location?.lat ?? 0,
+    lon: i.location?.lon ?? 0,
+  }));
 
-export function VolunteerCards({ volunteers }: { volunteers: { name: string; skills: string; location: string; status: string; phone: string; avatar: string; nearestIncident: string; nearestIncidentDesc: string }[] }) {
-    return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto pb-6">
-            {volunteers.map((v, i) => (
-                <div key={v.name + i} className="bg-white border border-slate-200 shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col group relative overflow-hidden">
-                    <div className={`absolute top-0 left-0 w-full h-1 ${v.status === "Available" ? "bg-success" : v.status === "Deployed" ? "bg-warning" : v.status === "Unavailable" ? "bg-slate-300" : "bg-slate-300"}`}></div>
-                    <div className="p-5 flex-1 flex flex-col items-center text-center">
-                        <div className="relative mb-3">
-                            <div className="h-16 w-16 rounded-full bg-slate-200 flex items-center justify-center overflow-hidden border-2 border-white shadow-sm">
-                                <img alt="Profile" className="h-full w-full object-cover" src={v.avatar || defaultAvatarUrl} />
-                            </div>
-                            <span className={`absolute bottom-0 right-0 h-4 w-4 rounded-full ${v.status === "Available" ? "bg-success" : v.status === "Deployed" ? "bg-warning" : "bg-slate-400"} border-2 border-white`}></span>
-                        </div>
-                        <h3 className="text-base font-bold text-slate-900 mb-1">{v.name}</h3>
-                        <div className="flex items-center gap-1 text-xs text-slate-500 mb-4">
-                            <span className="material-symbols-outlined text-[14px]">call</span>
-                            {v.phone || "+-- (---) --- ----"}
-                        </div>
-                        <div className="w-full bg-slate-50 rounded p-3 mb-3 border border-slate-100 ">
-                            <div className="flex items-center justify-between text-xs mb-1">
-                                <span className="font-bold text-slate-500 uppercase text-[10px]">Location (GPS)</span>
-                                <LoactionIcon className="size-4 text-primary" />
-                            </div>
-                            <div className="font-mono text-xs text-slate-700">
-                                {v.location || "--.----° N, --.----° E"}
-                            </div>
-                        </div>
-                        <div className="w-full text-left">
-                            <span className="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nearest Active Incident</span>
-                            <div className={`flex items-start gap-2 text-xs ${v.nearestIncident ? "bg-red-50 p-2 rounded border border-red-100" : "bg-slate-50 p-2 rounded border border-slate-100 text-slate-500"}`}>
-                                <EmergencyVolIcon className="size-4 text-destruction shrink-0" />
-                                <span className="font-medium text-slate-800 truncate">
-                                    {v.nearestIncident ? `Close to: ${v.nearestIncident}` : "No incident nearby"}
-                                    {v.nearestIncidentDesc ? <><br /><span className="text-[10px] font-normal text-slate-500">({v.nearestIncidentDesc})</span></> : null}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+  const formatCoords = (lat: number, lon: number) => {
+    const latDir = lat >= 0 ? "N" : "S";
+    const lonDir = lon >= 0 ? "E" : "W";
+
+    return `${Math.abs(lat).toFixed(4)}° ${latDir}, ${Math.abs(lon).toFixed(
+      4,
+    )}° ${lonDir}`;
+  };
+
+  return (
+    <div className="grid grid-cols-1 gap-6 overflow-y-auto pb-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {volunteers.map((v) => {
+        const hasValidLocation =
+          typeof v.last_location?.lat === "number" &&
+          typeof v.last_location?.lon === "number";
+
+        const nearestIncident = hasValidLocation
+          ? findClosestIncident(v.last_location!, incidentCoords)
+          : null;
+
+        const nearestIncidentData: IncidentsRecord | undefined = nearestIncident
+          ? incidents.find((i) => i.id === nearestIncident.incident.id)
+          : undefined;
+
+        const hasIncident = Boolean(nearestIncidentData);
+
+        return (
+          <div
+            key={v.id}
+            className="group relative flex flex-col overflow-hidden border border-slate-200 bg-white shadow-card transition-all duration-200 hover:shadow-card-hover"
+          >
+            <div className="flex flex-col items-center p-5 text-center">
+              <h3 className="mb-2 font-bold text-base text-slate-900">
+                {v.name}
+              </h3>
+
+              {/* PERSONAL INFO */}
+              <div className="flex w-full flex-col items-center gap-3 text-slate-600 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Phone No:</span>
+                  <span>{v.phone || "+-- (---) --- ----"}</span>
                 </div>
-            ))}
-        </div>
-    )
+
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Adhaar No:</span>
+                  <span>{v.adhar_number || "N/A"}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">Blood Grp:</span>
+                  <span>{v.blood_type || "N/A"}</span>
+                </div>
+              </div>
+
+              {/* LOCATION + INCIDENT SECTION */}
+              <div className="mt-5 flex w-full flex-col gap-4">
+                {/* LOCATION */}
+                <div className="rounded border border-slate-100 bg-slate-200 p-3">
+                  <span className="mb-2 block font-bold text-[10px] text-slate-500 uppercase">
+                    Location (GPS)
+                  </span>
+
+                  <div className="flex items-center gap-2 text-slate-700 text-xs">
+                    <LoactionIcon className="size-4 shrink-0 text-primary" />
+
+                    <span className="font-mono">
+                      {hasValidLocation
+                        ? formatCoords(
+                            v.last_location!.lat,
+                            v.last_location!.lon,
+                          )
+                        : "Locating..."}
+                    </span>
+                  </div>
+                </div>
+
+                {/* NEAREST INCIDENT */}
+                <div>
+                  <span className="mb-2 block font-bold text-[10px] text-slate-500 uppercase">
+                    Nearest Active Incident
+                  </span>
+
+                  <div
+                    className={cn(
+                      "flex items-start gap-2 rounded border p-3 text-xs",
+                      hasIncident
+                        ? "border-red-100 bg-red-100"
+                        : "border-slate-100 bg-slate-50 text-slate-500",
+                    )}
+                  >
+                    <EmergencyVolIcon className="size-4 shrink-0 text-destructive" />
+
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium text-slate-800">
+                        {hasIncident
+                          ? (nearestIncidentData?.title ?? "Incident")
+                          : "No incident nearby"}
+                      </span>
+
+                      {hasIncident && nearestIncident?.distance && (
+                        <span className="text-[10px] text-slate-500">
+                          {(nearestIncident.distance / 1000).toFixed(2)} km away
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }

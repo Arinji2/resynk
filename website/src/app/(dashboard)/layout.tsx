@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <Navbar />
       <div className="flex h-full w-full flex-col items-start justify-start gap-4">
         <Header IncidentName={"Flash Flood Sector 4"} INC={"2024-884"} />
-        <div className="h-full w-full px-4">{children}</div>
+        <div className="bg-grid-pattern h-full w-full px-4">{children}</div>
         <div className="mt-auto h-fit w-full">
           <LiveFeed />
         </div>
