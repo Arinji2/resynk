@@ -44,12 +44,17 @@ export default function Index() {
                 <Text variant={"muted"}>Radius Active</Text>
               </View>
             </View>
-            <Button className="h-fit w-full py-3">
-              <Link href="/reports">
+
+            <Link
+              asChild
+              href="/reports"
+              className="flex flex-row items-center justify-center"
+            >
+              <Button className="flex h-fit w-full flex-row items-center justify-center">
                 <MaterialIcons name="add-circle" size={18} color="white" />
                 <Text>Create New Report</Text>
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </View>
         </View>
       </ScrollView>
