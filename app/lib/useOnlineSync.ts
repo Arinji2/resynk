@@ -1,5 +1,6 @@
 import NetInfo from "@react-native-community/netinfo";
 import * as FileSystem from "expo-file-system/legacy";
+import * as Location from "expo-location";
 import * as Notifications from "expo-notifications";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useRef } from "react";
@@ -56,7 +57,7 @@ export function useOnlineSync() {
                   title: r.title,
                   description: r.description,
                   imageUri: imageBase64,
-                  createdAt: r.createdAt,
+                  createdAt: r.createdAt.toString(),
                   latitude: r.latitude,
                   longitude: r.longitude,
                   meshSyncID: r.meshSyncId,
@@ -64,20 +65,25 @@ export function useOnlineSync() {
               }),
             );
 
+            const loc = await Location.getLastKnownPositionAsync();
             const payload = {
               user: {
                 name: user?.name,
                 role: user?.role,
                 age: user?.age,
                 aadharNumber: user?.aadharNumber,
-                allergies: user?.allergies,
-                medications: user?.medications,
+                allergies: user?.allergies ?? "",
+                medications: user?.medications ?? "",
                 bloodGroup: user?.bloodGroup,
+                last_location: {
+                  lat: loc?.coords.latitude,
+                  long: loc?.coords.longitude,
+                },
               },
               reports: reportsWithBase64,
             };
 
-            const res = await fetch("http://127.0.0.1:8000/sync", {
+            const res = await fetch("https://resynk-backend.arinji.com/sync/", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
