@@ -61,14 +61,14 @@ export function ReportCardsRep({
     const colors = statusColorMap[reports[0]?.statusColor || "red"]
 
     return (
-        <div className="p-6 flex-1 bg-slate-50/50 dark:bg-slate-900/50">
+        <div className="p-6 flex-1 bg-slate-50/50">
             <div className="grid grid-cols-1 gap-4">
                 {reports.map((report) => {
                     const reportColors = statusColorMap[report.statusColor]
                     return (
                         <div
                             key={report.reportId}
-                            className="bg-white dark:bg-surface-dark rounded border border-slate-200 dark:border-slate-700 shadow-card hover:shadow-card-hover transition-shadow overflow-hidden group flex flex-col md:flex-row"
+                            className="bg-white rounded border border-slate-200 shadow-card hover:shadow-card-hover transition-shadow overflow-hidden group flex flex-col md:flex-row"
                         >
                             <div className="w-full md:w-48 h-48 md:h-auto shrink-0 bg-slate-200 relative overflow-hidden">
                                 <img
@@ -84,7 +84,7 @@ export function ReportCardsRep({
                                 <div>
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="flex items-center gap-2">
-                                            <h3 className="text-base font-bold text-slate-800 dark:text-slate-100 uppercase group-hover:text-primary-accent transition-colors">
+                                            <h3 className="text-base font-bold text-slate-800 uppercase group-hover:text-primary-accent transition-colors">
                                                 {report.title}
                                             </h3>
                                             <span
@@ -95,29 +95,29 @@ export function ReportCardsRep({
                                         </div>
                                         <span className="text-xs text-slate-400 font-mono">{report.reportId}</span>
                                     </div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">
+                                    <p className="text-sm text-slate-600 mb-4 line-clamp-2">
                                         {report.description}
                                     </p>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-500 mb-2">
                                         <div>
                                             <span className="block text-[10px] font-bold uppercase text-slate-400">Coordinates</span>
-                                            <span className="font-mono text-slate-700 dark:text-slate-300">{report.coordinates}</span>
+                                            <span className="font-mono text-slate-700">{report.coordinates}</span>
                                         </div>
                                         <div>
                                             <span className="block text-[10px] font-bold uppercase text-slate-400">Category</span>
-                                            <span className="font-medium text-slate-700 dark:text-slate-300">{report.category}</span>
+                                            <span className="font-medium text-slate-700">{report.category}</span>
                                         </div>
                                         <div>
                                             <span className="block text-[10px] font-bold uppercase text-slate-400">Reporter</span>
-                                            <span className="font-medium text-slate-700 dark:text-slate-300">{report.reporter}</span>
+                                            <span className="font-medium text-slate-700">{report.reporter}</span>
                                         </div>
                                         <div>
                                             <span className="block text-[10px] font-bold uppercase text-slate-400">Timestamp</span>
-                                            <span className="font-medium text-slate-700 dark:text-slate-300">{report.timestamp}</span>
+                                            <span className="font-medium text-slate-700">{report.timestamp}</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pt-3 mt-1 border-t border-slate-100 dark:border-slate-800 flex justify-end gap-2">
+                                <div className="pt-3 mt-1 border-t border-slate-100 flex justify-end gap-2">
                                     <button
                                         onClick={() => onViewMap?.(report.reportId)}
                                         className="px-3 py-1 text-[10px] font-bold uppercase text-slate-600 bg-slate-100 hover:bg-slate-200 rounded transition-colors"
@@ -136,16 +136,16 @@ export function ReportCardsRep({
                     )
                 })}
             </div>
-            <div className="mt-8 flex items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-4">
+            <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-4">
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                     <div>
-                        <p className="text-sm text-slate-700 dark:text-slate-400">
+                        <p className="text-sm text-slate-700">
                             Showing
-                            <span className="font-bold text-slate-900 dark:text-white"> {pagination.startResult} </span>
+                            <span className="font-bold text-slate-900"> {pagination.startResult} </span>
                             to
-                            <span className="font-bold text-slate-900 dark:text-white"> {pagination.endResult} </span>
+                            <span className="font-bold text-slate-900"> {pagination.endResult} </span>
                             of
-                            <span className="font-bold text-slate-900 dark:text-white"> {pagination.totalResults} </span>
+                            <span className="font-bold text-slate-900"> {pagination.totalResults} </span>
                             results
                         </p>
                     </div>
@@ -154,7 +154,7 @@ export function ReportCardsRep({
                             <button
                                 onClick={() => onPageChange?.(pagination.currentPage - 1)}
                                 disabled={pagination.currentPage === 1}
-                                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-surface-dark text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+                                className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 disabled:opacity-50"
                             >
                                 <span className="sr-only">Previous</span>
                                 <ChevLeftIcon className="w-5 h-5" />
@@ -167,7 +167,7 @@ export function ReportCardsRep({
                                     className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                         page === pagination.currentPage
                                             ? "z-10 bg-primary-accent border-primary-accent text-white font-bold"
-                                            : "bg-white dark:bg-surface-dark border-slate-300 dark:border-slate-600 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                            : "bg-white border-slate-300 text-slate-500 hover:bg-slate-50"
                                     } ${page > 3 && page < pagination.totalPages - 1 ? "hidden md:inline-flex" : ""}`}
                                 >
                                     {page}
@@ -176,7 +176,7 @@ export function ReportCardsRep({
                             <button
                                 onClick={() => onPageChange?.(pagination.currentPage + 1)}
                                 disabled={pagination.currentPage === pagination.totalPages}
-                                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 dark:border-slate-600 bg-white dark:bg-surface-dark text-sm font-medium text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
+                                className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 disabled:opacity-50"
                             >
                                 <span className="sr-only">Next</span>
                                 <ChevRightIcon className="w-5 h-5" />
