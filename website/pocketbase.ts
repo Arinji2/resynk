@@ -7,4 +7,6 @@ await pb
   .collection("_superusers")
   .authWithPassword(process.env.PB_EMAIL!, process.env.PB_PASS!);
 
+pb.autoCancellation(false);
+
 export default pb;
