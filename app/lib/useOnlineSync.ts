@@ -1,4 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
+import * as FileSystem from "expo-file-system";
 import * as Notifications from "expo-notifications";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useRef } from "react";
@@ -41,6 +42,34 @@ export function useOnlineSync() {
               "SELECT * FROM reports ORDER BY createdAt DESC",
             );
 
+            const reportsWithBase64 = await Promise.all(
+              reports.map(async (r) => {
+                let imageBase64 = "";
+
+                if (r.imageUri?.startsWith("file://")) {
+                  const base64 = await FileSystem.readAsStringAsync(
+                    r.imageUri,
+                    {
+                      encoding: "base64",
+                    },
+                  );
+
+                  imageBase64 = `data:image/jpeg;base64,${base64}`;
+                }
+
+                return {
+                  id: r.id,
+                  title: r.title,
+                  description: r.description,
+                  imageUri: imageBase64,
+                  createdAt: r.createdAt,
+                  latitude: r.latitude,
+                  longitude: r.longitude,
+                  meshSyncID: r.meshSyncId,
+                };
+              }),
+            );
+
             const payload = {
               user: {
                 name: user?.name,
@@ -51,16 +80,7 @@ export function useOnlineSync() {
                 medications: user?.medications,
                 bloodGroup: user?.bloodGroup,
               },
-              reports: reports.map((r) => ({
-                id: r.id,
-                title: r.title,
-                description: r.description,
-                imageUri: r.imageUri,
-                createdAt: r.createdAt,
-                latitude: r.latitude,
-                longitude: r.longitude,
-                meshSyncID: r.meshSyncId,
-              })),
+              reports: reportsWithBase64,
             };
 
             const res = await fetch("https://your-api.com/sync", {

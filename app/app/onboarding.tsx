@@ -26,8 +26,8 @@ export default function Onboarding() {
   // ---------------- CITIZEN ----------------
 
   const handleCitizenSubmit = async () => {
-    if (!name.trim() || !age.trim()) {
-      Alert.alert("Name and Age are required");
+    if (!name.trim() || !age.trim() || !aadharNumber.trim() || !bloodGroup) {
+      Alert.alert("Name, Age, Aadhar and Blood Group are required");
       return;
     }
 
@@ -35,10 +35,10 @@ export default function Onboarding() {
       role: "citizen",
       name: name.trim(),
       age: Number(age),
-      aadharNumber: aadharNumber || null,
+      aadharNumber: aadharNumber,
       allergies: allergies || null,
       medications: medications || null,
-      bloodGroup: bloodGroup || null,
+      bloodGroup: bloodGroup,
     });
 
     router.replace("/");
@@ -47,8 +47,8 @@ export default function Onboarding() {
   // ---------------- VOLUNTEER ----------------
 
   const handleVolunteerSubmit = async () => {
-    if (!name.trim() || !age.trim() || !aadharNumber.trim()) {
-      Alert.alert("Name, Age and Aadhar are required");
+    if (!name.trim() || !age.trim() || !aadharNumber.trim() || !bloodGroup) {
+      Alert.alert("Name, Age, Aadhar and Blood Group are required");
       return;
     }
 
@@ -64,7 +64,7 @@ export default function Onboarding() {
       aadharNumber: aadharNumber.trim(),
       allergies: allergies || null,
       medications: medications || null,
-      bloodGroup: bloodGroup || null,
+      bloodGroup: bloodGroup,
     });
 
     router.replace("/");
@@ -220,9 +220,7 @@ function FormFields({
       </View>
 
       <View className="flex w-full flex-col gap-2">
-        <Text className="text-muted-foreground text-sm">
-          Aadhar Number {`(mandatory for volunteers)`}
-        </Text>
+        <Text className="text-muted-foreground text-sm">Aadhar Number *</Text>
         <Input
           value={aadharNumber}
           onChangeText={setAadharNumber}
@@ -239,9 +237,7 @@ function FormFields({
       </View>
 
       <View className="flex w-full flex-col gap-2">
-        <Text className="text-muted-foreground text-sm">
-          Blood Group (optional)
-        </Text>
+        <Text className="text-muted-foreground text-sm">Blood Group *</Text>
         <Input value={bloodGroup} onChangeText={setBloodGroup} />
       </View>
 
