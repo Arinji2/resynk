@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { IncidentsRecord } from "../../../../pocketbase-types";
+import type { IncidentsRecord } from "../../../pocketbase-types";
 
 const IndiaMap = dynamic(() => import("./map"), { ssr: false });
 

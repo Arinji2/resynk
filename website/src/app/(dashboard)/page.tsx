@@ -2,9 +2,9 @@ import { ActiveVolunteers } from "@/components/prateek/Dashboard/activevolunteer
 import { IncidentCard } from "@/components/prateek/Dashboard/incidentcard";
 import { NewsFeed } from "@/components/prateek/Dashboard/newsfeed";
 import { Reportcard } from "@/components/prateek/Dashboard/reportcard";
-import pb from "../../../../pocketbase";
 import IndiaMapWrapper from "./map-wrapper";
 import { getNews } from "./news";
+import pb from "../../../pocketbase";
 
 export default async function Home() {
   const incidentsData = await pb.collection("incidents").getFullList();

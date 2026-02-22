@@ -7,7 +7,7 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { IncidentsRecord } from "../../../../pocketbase-types";
+import type { IncidentsRecord } from "../../../pocketbase-types";
 
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
@@ -19,8 +19,6 @@ const indiaBounds: LatLngBoundsExpression = [
   [6.5546079, 68.1113787],
   [35.6745457, 97.395561],
 ];
-
-const punePosition: [number, number] = [18.52, 73.85];
 
 function RestrictToIndia() {
   const map = useMap();
@@ -67,10 +65,6 @@ export default function IndiaMap({
             return null;
           }
         })}
-
-        <Marker position={punePosition}>
-          <Popup>Pune</Popup>
-        </Marker>
 
         <RestrictToIndia />
       </MapContainer>
