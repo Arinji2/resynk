@@ -1,5 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import * as FileSystem from "expo-file-system";
+import * as FileSystem from "expo-file-system/legacy";
 import * as Notifications from "expo-notifications";
 import * as SQLite from "expo-sqlite";
 import { useEffect, useRef } from "react";
@@ -10,7 +10,6 @@ const db = SQLite.openDatabaseSync("mesh.db");
 
 export function useOnlineSync() {
   const { user } = useUserProfile();
-
   const wasOfflineRef = useRef(false);
   const debounceTimerRef = useRef<number | null>(null);
   const isSyncingRef = useRef(false);
@@ -32,9 +31,7 @@ export function useOnlineSync() {
         // Wait 3 seconds before syncing
         debounceTimerRef.current = setTimeout(async () => {
           if (isSyncingRef.current) return;
-
           isSyncingRef.current = true;
-
           console.log("[OnlineSync] Debounce passed — syncing");
 
           try {
@@ -45,18 +42,15 @@ export function useOnlineSync() {
             const reportsWithBase64 = await Promise.all(
               reports.map(async (r) => {
                 let imageBase64 = "";
-
                 if (r.imageUri?.startsWith("file://")) {
                   const base64 = await FileSystem.readAsStringAsync(
                     r.imageUri,
                     {
-                      encoding: "base64",
+                      encoding: FileSystem.EncodingType.Base64,
                     },
                   );
-
                   imageBase64 = `data:image/jpeg;base64,${base64}`;
                 }
-
                 return {
                   id: r.id,
                   title: r.title,
@@ -83,7 +77,7 @@ export function useOnlineSync() {
               reports: reportsWithBase64,
             };
 
-            const res = await fetch("https://your-api.com/sync", {
+            const res = await fetch("http://127.0.0.1:8000/sync", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload),
