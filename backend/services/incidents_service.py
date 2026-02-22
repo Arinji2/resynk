@@ -14,11 +14,15 @@ def find_or_create_incident_with_ai(data):
     """
 
     # 🔹 1️⃣ AI ANALYSIS
-    ai_data = analyze_report_for_incident({
-        "description": data.description,
-        "latitude": data.latitude,
-        "longitude": data.longitude
-    })
+    try:
+        ai_data = analyze_report_for_incident({
+            "description": data.description,
+            "latitude": data.latitude,
+            "longitude": data.longitude
+        })
+    except Exception as e:
+        print(f"AI ANALYSIS FAILED (report will be created without incident): {e}")
+        return None
 
     if not ai_data:
         return None
@@ -54,7 +58,7 @@ def find_or_create_incident_with_ai(data):
             "location": ai_data["location"],
             "ai_where": ai_data["ai_where"],
             "ai_what": ai_data["ai_what"],
-            "ai_how": ai_data["ai_how"],
+            "ai_when": ai_data["ai_when"],
             "ai_infrastructure": ai_data["ai_infrastructure"],
         },
     )
