@@ -1,8 +1,6 @@
-"use client"
+"use client";
 
-import { ExpandMoreIcon } from "@/components/icons/expand_more-incident"
-import { SearchIcon } from "@/components/icons/search-incident"
-import { SortIcon } from "@/components/icons/sort-incident"
+import { SearchIcon } from "@/components/icons/search-incident";
 
 export function SearchBar() {
     return(
