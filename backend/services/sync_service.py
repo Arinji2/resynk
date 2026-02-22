@@ -1,5 +1,8 @@
 import requests
 import uuid
+import base64
+import io
+import json
 from services.pocketbase_service import POCKETBASE_URL, get_superuser_token, is_success
 
 
@@ -84,22 +87,61 @@ def find_report_by_mesh_sync_id(mesh_sync_id: str, token: str):
 
 
 def create_report_record(report, incident_id: str, token: str):
-    payload = {
+    # Prepare form data
+    data = {
         "title": report.title,
         "description": report.description,
-        "image": report.imageUri,
-        "location": {"lat": report.latitude, "lon": report.longitude},
+        "location": json.dumps({"lat": report.latitude, "lon": report.longitude}),
         "mesh_sync_id": report.meshSyncID,
         "incident": incident_id,
         "status": "pending",
     }
+
+    files = {}
+    
+    # Handle base64 image if present
+    if report.imageUri and (report.imageUri.startswith("data:image") or len(report.imageUri) > 100):
+        try:
+            # Strip prefix if present (e.g., "data:image/jpeg;base64,")
+            if "," in report.imageUri:
+                header, base64_str = report.imageUri.split(",", 1)
+                # Try to extract extension from header
+                ext = "jpg"
+                if "image/" in header:
+                    ext = header.split("image/")[1].split(";")[0]
+            else:
+                base64_str = report.imageUri
+                ext = "jpg"
+
+            image_data = base64.b64decode(base64_str)
+            files["image"] = (f"sync_report_{uuid.uuid4().hex[:6]}.{ext}", io.BytesIO(image_data))
+        except Exception as e:
+            print(f"[SYNC] Image decoding failed: {e}")
+
+    # Use multipart/form-data for files
     response = requests.post(
         f"{POCKETBASE_URL}/api/collections/{REPORTS_COLLECTION}/records",
-        json=payload,
+        data=data,
+        files=files if files else None,
         headers=_auth_headers(token),
     )
+
     if is_success(response.status_code):
         return response.json()
+    
+    # If storage failed, try without image as fallback (don't lose the report)
+    if files:
+        print(f"[SYNC] Multipart upload failed ({response.status_code}), retrying WITHOUT image...")
+        # PB expects JSON if no files are sent
+        json_payload = {k: (json.loads(v) if k == "location" else v) for k, v in data.items()}
+        response = requests.post(
+            f"{POCKETBASE_URL}/api/collections/{REPORTS_COLLECTION}/records",
+            json=json_payload,
+            headers=_auth_headers(token),
+        )
+        if is_success(response.status_code):
+            return response.json()
+
     print(f"[SYNC] REPORT CREATE FAILED ({response.status_code}): {response.text}")
     return None
 
