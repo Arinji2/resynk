@@ -84,19 +84,24 @@ def find_report_by_mesh_sync_id(mesh_sync_id: str, token: str):
 
 
 def create_report_record(report, incident_id: str, token: str):
+    payload = {
+        "title": report.title,
+        "description": report.description,
+        "image": report.imageUri,
+        "location": {"lat": report.latitude, "lon": report.longitude},
+        "mesh_sync_id": report.meshSyncID,
+        "incident": incident_id,
+        "status": "pending",
+    }
     response = requests.post(
         f"{POCKETBASE_URL}/api/collections/{REPORTS_COLLECTION}/records",
-        json={
-            "title": report.title,
-            "description": report.description,
-            "image": report.imageUri,
-            "location": {"lat": report.latitude, "lon": report.longitude},
-            "mesh_sync_id": report.meshSyncID,
-            "incident": incident_id,
-        },
+        json=payload,
         headers=_auth_headers(token),
     )
-    return response.json() if is_success(response.status_code) else None
+    if is_success(response.status_code):
+        return response.json()
+    print(f"[SYNC] REPORT CREATE FAILED ({response.status_code}): {response.text}")
+    return None
 
 
 # --- Incident helpers ---
@@ -119,20 +124,18 @@ def create_incident(title: str, report, token: str):
 
     ai_data = None
     try:
-        print(f"[SYNC] Starting AI analysis for: {report.description[:50]}...")
         ai_data = analyze_report_for_incident({
             "description": report.description,
             "latitude": report.latitude,
             "longitude": report.longitude
         })
-        print(f"[SYNC] AI result: {ai_data}")
     except Exception as e:
-        print(f"[SYNC] AI analysis EXCEPTION: {type(e).__name__}: {e}")
+        print(f"AI analysis failed for sync incident: {e}")
 
     if ai_data:
-        print(f"[SYNC] Using AI data for incident")
         payload = {
             "title": ai_data.get("title", title),
+            "category": ai_data.get("category", ""),
             "location": {"lat": report.latitude, "lon": report.longitude},
             "status": ai_data.get("status", "active"),
             "priority_score": ai_data.get("priority_score", 1),
@@ -143,7 +146,6 @@ def create_incident(title: str, report, token: str):
             "ai_infrastructure": ai_data.get("ai_infrastructure", []),
         }
     else:
-        print(f"[SYNC] WARNING: ai_data is None, creating incident WITHOUT AI fields")
         payload = {
             "title": title,
             "location": {"lat": report.latitude, "lon": report.longitude},
@@ -151,13 +153,11 @@ def create_incident(title: str, report, token: str):
             "priority_score": 1,
         }
 
-    print(f"[SYNC] Incident payload: {payload}")
     response = requests.post(
         f"{POCKETBASE_URL}/api/collections/{INCIDENTS_COLLECTION}/records",
         json=payload,
         headers=_auth_headers(token),
     )
-    print(f"[SYNC] Incident create response ({response.status_code}): {response.text[:200]}")
     return response.json() if is_success(response.status_code) else None
 
 
@@ -166,22 +166,21 @@ def _run_ai_analysis(report):
     from services.incident_ai_service import analyze_report_for_incident
 
     try:
-        print(f"[SYNC] Starting AI analysis for: {report.description[:50]}...")
         ai_data = analyze_report_for_incident({
             "description": report.description,
             "latitude": report.latitude,
             "longitude": report.longitude
         })
-        print(f"[SYNC] AI result: {ai_data}")
         return ai_data
     except Exception as e:
-        print(f"[SYNC] AI analysis EXCEPTION: {type(e).__name__}: {e}")
+        print(f"AI analysis failed: {e}")
         return None
 
 
 def _update_incident_with_ai(incident_id: str, ai_data: dict, token: str):
     """Update an existing incident with AI-generated fields."""
     payload = {
+        "category": ai_data.get("category", ""),
         "zone_sector": ai_data.get("zone_sector", ""),
         "ai_where": ai_data.get("ai_where", ""),
         "ai_what": ai_data.get("ai_what", ""),
@@ -189,32 +188,64 @@ def _update_incident_with_ai(incident_id: str, ai_data: dict, token: str):
         "ai_infrastructure": ai_data.get("ai_infrastructure", []),
         "priority_score": ai_data.get("priority_score", 1),
     }
-    print(f"[SYNC] Updating incident {incident_id} with AI data: {payload}")
     response = requests.patch(
         f"{POCKETBASE_URL}/api/collections/{INCIDENTS_COLLECTION}/records/{incident_id}",
         json=payload,
         headers=_auth_headers(token),
     )
-    print(f"[SYNC] Update response ({response.status_code}): {response.text[:200]}")
+
+
+def find_incident_by_location_and_category(lat: float, lon: float, category: str, token: str, radius_km: float = 2.0):
+    """Find an existing incident of the same category within a radius."""
+    # Roughly 1 degree is 111km
+    delta = radius_km / 111.0
+    min_lat, max_lat = lat - delta, lat + delta
+    min_lon, max_lon = lon - delta, lon + delta
+
+    # PocketBase filter for bounding box and category
+    # We use .lat and .lon to access JSON object properties
+    filter_str = f"(category='{category}' && location.lat >= {min_lat} && location.lat <= {max_lat} && location.lon >= {min_lon} && location.lon <= {max_lon})"
+    
+    response = requests.get(
+        f"{POCKETBASE_URL}/api/collections/{INCIDENTS_COLLECTION}/records",
+        params={"filter": filter_str},
+        headers=_auth_headers(token),
+    )
+    data = response.json()
+    items = data.get("items", [])
+    return items[0] if items else None
 
 
 def find_or_create_incident(report, token: str):
-    """Find an incident by title, or create a new one. Backfill AI data if missing."""
-    existing = find_incident_by_title(report.title, token)
+    """Find an incident by location and category, or create a new one."""
+    
+    # Step 1: Run AI analysis first to get the category
+    ai_data = _run_ai_analysis(report)
+    if not ai_data:
+        # Fallback to title-based matching if AI fails
+        existing = find_incident_by_title(report.title, token)
+        if existing:
+            return existing["id"]
+        # Create without AI if necessary
+        new_incident = create_incident(report.title, report, token)
+        return new_incident["id"] if new_incident else None
+
+    category = ai_data.get("category", "")
+    
+    # Step 2: Try to find existing incident by location and category
+    existing = find_incident_by_location_and_category(
+        report.latitude, report.longitude, category, token
+    )
+    
     if existing:
-        # Check if AI fields are empty — if so, run AI and update
+        # Backfill AI data if missing
         if not existing.get("ai_where") and not existing.get("ai_what"):
-            print(f"[SYNC] Found incident '{report.title}' but AI fields are empty, running AI...")
-            ai_data = _run_ai_analysis(report)
-            if ai_data:
-                _update_incident_with_ai(existing["id"], ai_data, token)
+            _update_incident_with_ai(existing["id"], ai_data, token)
         return existing["id"]
 
-    # No existing incident — create new one with AI
+    # Step 3: No existing nearby incident found, create new one
     new_incident = create_incident(report.title, report, token)
-    if new_incident:
-        return new_incident["id"]
-    return None
+    return new_incident["id"] if new_incident else None
 
 
 # --- Main sync logic ---
