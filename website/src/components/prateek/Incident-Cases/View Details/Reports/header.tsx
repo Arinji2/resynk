@@ -4,13 +4,13 @@ import { DownloadIcon } from "@/components/icons/download"
 
 export function HeaderRep() {
     return (
-        <header className="h-16 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-700 px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm shrink-0">
+        <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-20 shadow-sm shrink-0">
 <div className="flex items-center gap-4">
 <button className="md:hidden p-2 text-slate-500">
 <span className="material-symbols-outlined">menu</span>
 </button>
 <div>
-<h2 className="text-lg font-bold text-slate-900 dark:text-white uppercase tracking-tight">Reports Management</h2>
+<h2 className="text-lg font-bold text-slate-900 uppercase tracking-tight">Reports Management</h2>
 <div className="flex items-center gap-2">
 <span className="text-[10px] uppercase text-slate-500 font-medium">Viewing 25 of 1,204 Records</span>
 </div>
