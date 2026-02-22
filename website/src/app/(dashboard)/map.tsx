@@ -4,16 +4,22 @@ import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { IncidentsRecord } from "../../../pocketbase-types";
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+const DefaultIcon = L.icon({
+  iconUrl: markerIcon.src ?? markerIcon,
+  iconRetinaUrl: markerIcon2x.src ?? markerIcon2x,
+  shadowUrl: markerShadow.src ?? markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const indiaBounds: LatLngBoundsExpression = [
   [6.5546079, 68.1113787],
@@ -22,9 +28,6 @@ const indiaBounds: LatLngBoundsExpression = [
 
 function RestrictToIndia() {
   const map = useMap();
-  const [defined, setDefined] = useState(false);
-
-  useEffect(() => setDefined(true), []);
 
   useEffect(() => {
     map.setMaxBounds(indiaBounds);
@@ -32,8 +35,6 @@ function RestrictToIndia() {
     map.setMinZoom(5);
     map.setMaxZoom(10);
   }, [map]);
-
-  if (!defined) return null;
 
   return null;
 }
@@ -52,18 +53,20 @@ export default function IndiaMap({
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
         {incidentsData.map((incident) => {
-          if (incident.location?.lat && incident.location.lon) {
+          if (
+            incident.location?.lat != null &&
+            incident.location?.lon != null
+          ) {
             return (
               <Marker
                 key={incident.id}
-                position={[incident.location?.lat, incident.location.lon]}
+                position={[incident.location.lat, incident.location.lon]}
               >
                 <Popup>{incident.title}</Popup>
               </Marker>
             );
-          } else {
-            return null;
           }
+          return null;
         })}
 
         <RestrictToIndia />
