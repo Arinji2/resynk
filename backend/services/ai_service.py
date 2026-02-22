@@ -33,6 +33,8 @@ Prompt:
 
     text = response.text.strip()
 
+    print(text)
+
     try:
         return json.loads(text)
     except Exception:

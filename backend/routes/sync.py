@@ -6,6 +6,10 @@ from services.sync_service import sync_data
 router = APIRouter()
 
 
+class LocationIn(BaseModel):
+    lat: float = 0.0
+    lon: float = 0.0
+
 class UserIn(BaseModel):
     name: str = ""
     role: str = ""
@@ -14,11 +18,9 @@ class UserIn(BaseModel):
     allergies: str = ""
     medications: str = ""
     bloodGroup: str = ""
+    last_location: LocationIn = LocationIn()
 
 
-class LocationIn(BaseModel):
-    lat: float = 0.0
-    lon: float = 0.0
 
 
 class ReportIn(BaseModel):
