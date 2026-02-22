@@ -22,6 +22,7 @@ Return JSON in EXACT format:
 
 {{
   "title": "Short incident title",
+  "category": "one of: earthquake, flood, fire, cyclone, landslide",
   "priority_score": number between 1-10,
   "status": "active",
   "zone_sector": "estimated zone or sector",
