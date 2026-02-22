@@ -9,9 +9,10 @@ export type UserProfile = {
   role: UserRole;
   name: string;
   age: number;
-  aadharNumber?: string | null;
+  aadharNumber: string;
   allergies?: string | null;
   medications?: string | null;
+  bloodGroup: string;
 };
 
 export function useUserProfile() {
