@@ -111,7 +111,7 @@ def create_incident(ai_data):
             "location": ai_data["location"],
             "ai_where": ai_data["ai_where"],
             "ai_what": ai_data["ai_what"],
-            "ai_how": ai_data["ai_how"],
+            "ai_when": ai_data["ai_when"],
             "ai_infrastructure": ai_data["ai_infrastructure"],
             "report_count": 1
         }

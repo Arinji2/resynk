@@ -28,7 +28,7 @@ Return JSON in EXACT format:
   "location": "human readable location",
   "ai_where": "Where it happened",
   "ai_what": "What happened",
-  "ai_how": "How it happened",
+  "ai_when": "When it happened",
   "ai_infrastructure": ["roads", "bridges"]
 }}
 
