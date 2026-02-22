@@ -7,23 +7,27 @@ load_dotenv()
 
 API_KEY = os.getenv("GOOGLE_API_KEY")
 
+if not API_KEY:
+    raise RuntimeError(
+        "GOOGLE_API_KEY not found. Make sure it exists in backend/.env"
+    )
+
 client = genai.Client(api_key=API_KEY)
 
 
 def ask_gemini(prompt: str):
-
     structured_prompt = f"""
-    You are an AI system that MUST return valid JSON.
-    Do not return markdown.
-    Do not return explanations.
-    Only return JSON.
+You are an AI system that MUST return valid JSON.
+Do not return markdown.
+Do not return explanations.
+Only return JSON.
 
-    Prompt:
-    {prompt}
-    """
+Prompt:
+{prompt}
+"""
 
     response = client.models.generate_content(
-        model="models/gemini-2.5-flash",
+        model="gemini-2.5-flash",
         contents=structured_prompt
     )
 
