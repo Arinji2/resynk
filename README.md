@@ -1,136 +1,108 @@
-Note: Run the following to have prefixing commits
-`git config core.hooksPath .githooks`
+🚀 ReSynk
 
-ReSynk
+🌍 Resilient Disaster Reporting & Synchronization Platform
+Offline-first. AI-powered. Family-aware.
 
-Decentralized Disaster Reporting & Synchronization Platform
-Built for real-time emergency coordination.
+🧠 What is ReSynk?
 
-What is ReSynk?
+ReSynk is an intelligent disaster coordination system designed to:
 
-ReSynk is a disaster management backend + mobile system that:
+📱 Collect reports from mobile devices (even offline)
 
-Collects disaster reports from phones (even offline)
+🔄 Sync data when connectivity is restored
 
-Syncs data when internet is available
+🤖 Use AI to classify disasters
 
-Uses AI (Gemini) to classify incidents
+🚨 Automatically group reports into incidents
 
-Groups reports into incidents by type + location
+👨‍👩‍👧 Organize users into households & families
 
-Stores base64 images as real files
+🖼️ Handle image uploads via Base64
 
-Uses PocketBase as backend database
+🗄️ Store structured disaster data using PocketBase
 
-Architecture
-
-Phone App
-⬇
-/sync endpoint
-⬇
+🏗️ System Architecture
+Mobile App (Expo)
+        │
+        ▼
 FastAPI Backend
-⬇
-AI Classification (Gemini)
-⬇
+        │
+        ├── User & Household Engine
+        ├── Sync Engine
+        ├── AI Incident Engine (Gemini)
+        ├── Image Processing Layer
+        │
+        ▼
 PocketBase Database
-
-Tech Stack
-Backend
-
-FastAPI
-
-PocketBase
-
-Google Gemini API
-
-Docker Ready
-
-Mobile
-
-Expo / React Native
-
-Core Features
-✅ 1. Disaster Reports
-
-Users can submit:
+✨ Core Features
+📄 Disaster Reports
 
 Title
 
 Description
 
-Latitude / Longitude
+Location (Latitude / Longitude)
 
-Image (Base64)
+Image (Base64 → Stored as file)
 
-Mesh Sync ID
+Mesh Sync ID (Deduplication)
 
-Images are:
+🤖 AI-Powered Incident Detection
 
-Decoded from base64
+Uses Google Gemini
 
-Uploaded as real files
+Extracts disaster type & severity
 
-Returned with full image URL
+Groups similar reports
 
-✅ 2. AI Incident Grouping
+Auto-creates incidents
 
-When a report is submitted:
+Links reports to incidents
 
-Gemini analyzes description
+👤 Users
 
-Detects incident type
+Stored via Aadhar identification
 
-Groups reports by:
+Medical data (blood group, allergies, medications)
 
-Disaster type
+Role & age
 
-Geographic proximity
+Linked to reports
 
-Either:
+🏠 Households & Families
 
-Creates new incident
+Each user can be head of household
 
-Or attaches to existing one
+Family members stored separately
 
-✅ 3. Offline Sync Support
+Structured disaster unit tracking
 
-Phone stores:
+Supports emergency prioritization
 
-User data
+🔄 Offline Sync System
 
-Reports
+Mobile sends:
 
-When online:
-
-Sends everything to /sync
+{
+  "user": {...},
+  "reports": [...]
+}
 
 Backend:
 
-Updates user
+Upserts user
+
+Creates/updates household
+
+Syncs family members
 
 Deduplicates reports
 
-Links to incidents
+Processes incidents
 
 Uploads images
 
-How Incident Grouping Works
-
-Reports are grouped if:
-
-Same disaster type
-
-Close geographic distance
-
-Similar title/context
-
-Example:
-
-5 flood reports in same area
-→ 1 Flood Incident
-→ 5 linked reports
-
-📂 Project Structure
+📂 Backend Structure
 backend/
 │
 ├── app/
@@ -138,6 +110,7 @@ backend/
 │   ├── routes/
 │   │   ├── reports.py
 │   │   ├── sync.py
+│   │   ├── incidents.py
 │   │   └── auth.py
 │   │
 │   └── services/
@@ -146,48 +119,25 @@ backend/
 │       ├── incident_ai_service.py
 │       └── ai_service.py
 │
-└── Dockerfile
-Environment Variables
+├── Dockerfile
+└── README.md
+🧠 How Incident Grouping Works
 
-Create .env file:
+Reports are grouped when:
 
-SUPERUSER_EMAIL=your_superuser_email
-SUPERUSER_PASSWORD=your_superuser_password
-GOOGLE_API_KEY=your_gemini_api_key
+Same disaster type
 
-Run Locally
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+Close geographic proximity
 
-Open:
+Similar title/context
 
-http://127.0.0.1:8000/docs
-Run with Docker
+Example:
 
-Build:
+5 flood reports in Mumbai
+→ 1 Flood Incident
+→ 5 linked reports
 
-docker build -t resynk-backend .
-
-Run:
-
-docker run -p 8000:8000 --env-file .env resynk-backend
-API Endpoints
-POST /reports
-
-Create single report
-
-POST /sync
-
-Bulk sync user + reports
-
-POST /auth/login
-
-Superuser authentication
-
-Image Handling
+🖼 Image Handling
 
 Mobile sends:
 
@@ -195,27 +145,94 @@ data:image/jpeg;base64,...
 
 Backend:
 
-Decodes base64
+Extract MIME type
 
-Converts to file
+Decode Base64
 
-Uploads to PocketBase
+Convert to binary
 
-Returns public image URL
+Upload to PocketBase
+
+Generate public image URL
 
 Frontend displays:
 
 <Image source={{ uri: report.image_url }} />
-🛡 Production Ready Features
+⚙️ Environment Variables
 
-Deduplication via mesh_sync_id
+Create a .env file inside backend:
 
-Superuser authentication
+SUPERUSER_EMAIL=your_email
+SUPERUSER_PASSWORD=your_password
+GOOGLE_API_KEY=your_gemini_key
+▶️ Running Locally
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
 
-AI-powered classification
+Visit:
 
-File upload handling
+http://127.0.0.1:8000/docs
+🐳 Docker Support
 
-Incident linking
+Build image:
 
-Scalable structure
+docker build -t resynk-backend .
+
+Run container:
+
+docker run -p 8000:8000 --env-file .env resynk-backend
+🔐 Security Model
+
+Superuser authentication via PocketBase
+
+Deduplication using mesh_sync_id
+
+Structured validation via Pydantic
+
+AI responses forced into strict JSON
+
+Base64 validation before upload
+
+📊 Data Relationships
+User
+  │
+  ├── Household
+  │     ├── Family Member
+  │     ├── Family Member
+  │
+  └── Reports
+        └── Incident
+🚀 Future Improvements
+
+Geo-clustering algorithm
+
+Redis caching
+
+Background AI worker queue
+
+Incident severity scoring engine
+
+Household vulnerability prioritization
+
+Admin dashboard
+
+💙 Project Meaning
+
+ReSynk = Resilient Synchronization
+
+A system built to sync disaster intelligence across devices, families, and regions — even in unstable conditions.
+
+🧑‍💻 Built With
+
+FastAPI
+
+PocketBase
+
+Google Gemini API
+
+Expo / React Native
+
+Docker
