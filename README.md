@@ -1,108 +1,159 @@
-🚀 ReSynk
+---
 
-🌍 Resilient Disaster Reporting & Synchronization Platform
-Offline-first. AI-powered. Family-aware.
+# 🚀 ReSynk
 
-🧠 What is ReSynk?
+<p align="center">
+  <b>Resilient Disaster Reporting & Synchronization Platform</b><br/>
+  Offline-First • AI-Powered • Family-Aware
+</p>
 
-ReSynk is an intelligent disaster coordination system designed to:
+---
 
-📱 Collect reports from mobile devices (even offline)
+## 🌍 Overview
 
-🔄 Sync data when connectivity is restored
+**ReSynk** is an intelligent disaster coordination backend built to collect, process, and organize disaster reports from mobile devices — even in low-connectivity environments.
 
-🤖 Use AI to classify disasters
+It combines:
 
-🚨 Automatically group reports into incidents
+* 📱 Offline-first mobile syncing
+* 🤖 AI-based disaster classification
+* 🚨 Automatic incident grouping
+* 👨‍👩‍👧 Household & family structuring
+* 🖼️ Base64 image handling
+* 🗄️ PocketBase data storage
 
-👨‍👩‍👧 Organize users into households & families
+---
 
-🖼️ Handle image uploads via Base64
+## 🏗️ System Architecture
 
-🗄️ Store structured disaster data using PocketBase
+```
+Mobile App (Expo / React Native)
+          │
+          ▼
+      FastAPI Backend
+          │
+          ├── Authentication Layer
+          ├── Sync Engine
+          ├── AI Incident Engine (Gemini)
+          ├── User & Household Manager
+          ├── Image Processing (Base64 → File)
+          │
+          ▼
+      PocketBase Database
+          ├── Users
+          ├── Households
+          ├── Family Members
+          ├── Reports
+          └── Incidents
+```
 
-🏗️ System Architecture
-Mobile App (Expo)
-        │
-        ▼
-FastAPI Backend
-        │
-        ├── User & Household Engine
-        ├── Sync Engine
-        ├── AI Incident Engine (Gemini)
-        ├── Image Processing Layer
-        │
-        ▼
-PocketBase Database
-✨ Core Features
-📄 Disaster Reports
+---
 
-Title
+## ✨ Core Features
 
-Description
+### 📄 Disaster Reports
 
-Location (Latitude / Longitude)
+Each report contains:
 
-Image (Base64 → Stored as file)
+* Title
+* Description
+* Latitude & Longitude
+* Image (Base64 encoded)
+* Mesh Sync ID (for deduplication)
 
-Mesh Sync ID (Deduplication)
+Reports are:
 
-🤖 AI-Powered Incident Detection
+* AI-classified
+* Linked to incidents
+* Stored with image files
+* Deduplicated safely
 
-Uses Google Gemini
+---
 
-Extracts disaster type & severity
+### 🤖 AI-Powered Incident Detection
 
-Groups similar reports
+When a report is received:
 
-Auto-creates incidents
+1. Description is sent to Google Gemini
+2. Disaster type & severity are extracted
+3. System checks for similar incidents
+4. Report is linked or new incident is created
 
-Links reports to incidents
+Example:
 
-👤 Users
+5 flood reports in same area
+→ 1 Flood Incident
+→ 5 linked reports
 
-Stored via Aadhar identification
+---
 
-Medical data (blood group, allergies, medications)
+### 👤 User Management
 
-Role & age
+Users are identified using Aadhar number.
 
-Linked to reports
+Stored data:
 
-🏠 Households & Families
+* Name
+* Role
+* Age
+* Blood group
+* Allergies
+* Medications
+* Last known location (optional)
 
-Each user can be head of household
+Users are automatically updated during sync.
 
-Family members stored separately
+---
 
-Structured disaster unit tracking
+### 🏠 Household & Family System
 
-Supports emergency prioritization
+Each user can belong to a household.
 
-🔄 Offline Sync System
+Structure:
+
+* 1 Head User
+* 1 Household
+* Multiple Family Members
+
+Family members store:
+
+* Full name
+* Age
+* Blood group
+* Allergies
+* Medical details
+
+This enables disaster vulnerability mapping and family-based emergency coordination.
+
+---
+
+### 🔄 Offline Sync System
 
 Mobile sends:
 
+```json
 {
   "user": {...},
   "reports": [...]
 }
+```
 
-Backend:
+Backend performs:
 
-Upserts user
+* User upsert
+* Household validation
+* Family sync
+* Report deduplication
+* AI classification
+* Image decoding
+* Incident linking
+* Structured response return
 
-Creates/updates household
+---
 
-Syncs family members
+## 📂 Backend Structure
 
-Deduplicates reports
-
-Processes incidents
-
-Uploads images
-
-📂 Backend Structure
+```
 backend/
 │
 ├── app/
@@ -121,82 +172,84 @@ backend/
 │
 ├── Dockerfile
 └── README.md
-🧠 How Incident Grouping Works
+```
 
-Reports are grouped when:
+---
 
-Same disaster type
-
-Close geographic proximity
-
-Similar title/context
-
-Example:
-
-5 flood reports in Mumbai
-→ 1 Flood Incident
-→ 5 linked reports
-
-🖼 Image Handling
+## 🖼 Image Processing Flow
 
 Mobile sends:
 
+```
 data:image/jpeg;base64,...
+```
 
 Backend:
 
-Extract MIME type
-
-Decode Base64
-
-Convert to binary
-
-Upload to PocketBase
-
-Generate public image URL
+1. Extracts MIME type
+2. Decodes Base64
+3. Converts to binary file
+4. Uploads via multipart form
+5. Stores file in PocketBase
+6. Generates public image URL
 
 Frontend displays:
 
+```javascript
 <Image source={{ uri: report.image_url }} />
-⚙️ Environment Variables
+```
 
-Create a .env file inside backend:
+---
 
-SUPERUSER_EMAIL=your_email
-SUPERUSER_PASSWORD=your_password
-GOOGLE_API_KEY=your_gemini_key
-▶️ Running Locally
+## 🔐 Environment Variables
+
+Create a `.env` file inside the backend folder:
+
+```
+SUPERUSER_EMAIL=your_superuser_email
+SUPERUSER_PASSWORD=your_superuser_password
+GOOGLE_API_KEY=your_gemini_api_key
+```
+
+---
+
+## ▶️ Running Locally
+
+```bash
 cd backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
+```
 
-Visit:
+Open:
 
+```
 http://127.0.0.1:8000/docs
-🐳 Docker Support
+```
 
-Build image:
+---
 
+## 🐳 Docker Deployment
+
+Build:
+
+```bash
 docker build -t resynk-backend .
+```
 
-Run container:
+Run:
 
+```bash
 docker run -p 8000:8000 --env-file .env resynk-backend
-🔐 Security Model
+```
 
-Superuser authentication via PocketBase
+---
 
-Deduplication using mesh_sync_id
+## 🧠 Data Relationships
 
-Structured validation via Pydantic
-
-AI responses forced into strict JSON
-
-Base64 validation before upload
-
-📊 Data Relationships
+```
 User
   │
   ├── Household
@@ -205,34 +258,35 @@ User
   │
   └── Reports
         └── Incident
-🚀 Future Improvements
+```
 
-Geo-clustering algorithm
+---
 
-Redis caching
+## 🛡 Security Model
 
-Background AI worker queue
+* Superuser authentication via PocketBase
+* Deduplication using mesh_sync_id
+* Strict JSON parsing from AI
+* Base64 validation before upload
+* Backend-only database credentials
 
-Incident severity scoring engine
+---
 
-Household vulnerability prioritization
+## 🚀 Future Improvements
 
-Admin dashboard
+* Geo-clustering optimization
+* Redis caching
+* Background AI worker queue
+* Incident severity scoring engine
+* Household vulnerability prioritization
+* Admin dashboard
 
-💙 Project Meaning
+---
 
-ReSynk = Resilient Synchronization
+## 💙 Project Meaning
 
-A system built to sync disaster intelligence across devices, families, and regions — even in unstable conditions.
+**ReSynk = Resilient Synchronization**
 
-🧑‍💻 Built With
+A system built to synchronize disaster intelligence across devices, families, and regions — even during unstable conditions.
 
-FastAPI
-
-PocketBase
-
-Google Gemini API
-
-Expo / React Native
-
-Docker
+---
